@@ -1,7 +1,7 @@
 
 # Invoice Intellect Extractor
 
-An AI-powered backend for extracting structured data from invoice images using custom machine learning models and OCR.
+An AI-powered application for extracting structured data from invoice images using custom machine learning models and OCR.
 
 ## Features
 
@@ -10,6 +10,7 @@ An AI-powered backend for extracting structured data from invoice images using c
 - Image preprocessing for enhanced quality and OCR accuracy
 - Custom machine learning models for entity classification
 - Relation extraction for identifying invoice items and pricing
+- React frontend for uploading invoices and viewing extracted data
 - Structured JSON output with key invoice information
 
 ## Getting Started
@@ -38,17 +39,22 @@ code .
 
 4. VS Code will build the container and set up the environment automatically.
 
-### Running the Server
+### Running the Application
 
 #### Development Server
 
 Inside the DevContainer:
 
 ```bash
+# Start the backend
 python app.py
+
+# Start the frontend (in a separate terminal)
+npm start
 ```
 
-The server will start at http://localhost:5000.
+The backend server will start at http://localhost:5000.
+The frontend will be available at http://localhost:3000.
 
 #### Production Server with Gunicorn
 
@@ -220,171 +226,135 @@ Where:
 - `entity_type` can be: "invoice_number", "invoice_date", "customer_name", "item_name", "item_quantity", "item_price", "subtotal", "total"
 - `relation_type` can be: "none", "item_quantity", "item_price", "item_total"
 
-### Custom Dataset Class
+### Sample Dataset for Testing
 
-To use the prepared dataset, create custom dataset classes that will replace the dummy datasets in the training script:
+Here's a simple example of how to create a small test dataset:
 
-```python
-# Create these files in the src/utils/ directory
-# src/utils/dataset.py
-
-import os
-import json
-import torch
-from torch.utils.data import Dataset
-import numpy as np
-from PIL import Image
-import doctr
-from transformers import AutoTokenizer, AutoModel
-
-class EntityDataset(Dataset):
-    def __init__(self, data_dir, split="train", transform=None):
-        """
-        Dataset for entity classification
-        
-        Args:
-            data_dir: Root directory of dataset
-            split: train, val, or test
-            transform: Optional transforms to apply
-        """
-        self.data_dir = data_dir
-        self.split = split
-        self.transform = transform
-        self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-        self.model = AutoModel.from_pretrained("distilbert-base-uncased")
-        
-        # Load annotations
-        self.annotations_dir = os.path.join(data_dir, "annotations", split)
-        self.image_dir = os.path.join(data_dir, "images", split)
-        
-        self.samples = []
-        for ann_file in os.listdir(self.annotations_dir):
-            if ann_file.endswith(".json"):
-                with open(os.path.join(self.annotations_dir, ann_file), "r") as f:
-                    annotation = json.load(f)
-                    
-                    # Extract features for each text block
-                    for text_block in annotation["text_blocks"]:
-                        self.samples.append({
-                            "text": text_block["text"],
-                            "position": text_block["position"],
-                            "entity_type": text_block["entity_type"],
-                            "image_path": os.path.join(self.image_dir, 
-                                                      os.path.basename(annotation["image_path"]))
-                        })
-    
-    def __len__(self):
-        return len(self.samples)
-    
-    def __getitem__(self, idx):
-        sample = self.samples[idx]
-        
-        # Extract text features using DistilBERT
-        inputs = self.tokenizer(sample["text"], return_tensors="pt", 
-                               padding="max_length", truncation=True, max_length=128)
-        
-        with torch.no_grad():
-            outputs = self.model(**inputs)
-        
-        # Use CLS token embedding as text features
-        features = outputs.last_hidden_state[:, 0, :].squeeze()
-        
-        # Get label
-        entity_types = {
-            "invoice_number": 0,
-            "invoice_date": 1,
-            "customer_name": 2,
-            "item_name": 3,
-            "item_quantity": 4,
-            "item_price": 5,
-            "subtotal": 6,
-            "total": 7
-        }
-        
-        label = entity_types[sample["entity_type"]]
-        
-        return features, torch.tensor(label)
-
-
-class RelationDataset(Dataset):
-    def __init__(self, data_dir, split="train", transform=None):
-        """
-        Dataset for relation extraction
-        
-        Args:
-            data_dir: Root directory of dataset
-            split: train, val, or test
-            transform: Optional transforms to apply
-        """
-        self.data_dir = data_dir
-        self.split = split
-        self.transform = transform
-        self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-        self.model = AutoModel.from_pretrained("distilbert-base-uncased")
-        
-        # Load annotations
-        self.annotations_dir = os.path.join(data_dir, "annotations", split)
-        self.image_dir = os.path.join(data_dir, "images", split)
-        
-        self.samples = []
-        for ann_file in os.listdir(self.annotations_dir):
-            if ann_file.endswith(".json"):
-                with open(os.path.join(self.annotations_dir, ann_file), "r") as f:
-                    annotation = json.load(f)
-                    
-                    # Create a map of text blocks
-                    text_blocks = {block["id"]: block for block in annotation["text_blocks"]}
-                    
-                    # Extract features for each relation
-                    for relation in annotation["relations"]:
-                        source_block = text_blocks[relation["source_id"]]
-                        target_block = text_blocks[relation["target_id"]]
-                        
-                        self.samples.append({
-                            "source_text": source_block["text"],
-                            "target_text": target_block["text"],
-                            "source_position": source_block["position"],
-                            "target_position": target_block["position"],
-                            "relation_type": relation["relation_type"],
-                            "image_path": os.path.join(self.image_dir, 
-                                                     os.path.basename(annotation["image_path"]))
-                        })
-    
-    def __len__(self):
-        return len(self.samples)
-    
-    def __getitem__(self, idx):
-        sample = self.samples[idx]
-        
-        # Extract text features for source and target
-        source_inputs = self.tokenizer(sample["source_text"], return_tensors="pt", 
-                                     padding="max_length", truncation=True, max_length=128)
-        target_inputs = self.tokenizer(sample["target_text"], return_tensors="pt", 
-                                     padding="max_length", truncation=True, max_length=128)
-        
-        with torch.no_grad():
-            source_outputs = self.model(**source_inputs)
-            target_outputs = self.model(**target_inputs)
-        
-        # Use CLS token embedding as text features
-        source_features = source_outputs.last_hidden_state[:, 0, :].squeeze()
-        target_features = target_outputs.last_hidden_state[:, 0, :].squeeze()
-        
-        # Concatenate features
-        features = torch.cat([source_features, target_features], dim=0)
-        
-        # Get label
-        relation_types = {
-            "none": 0,
-            "item_quantity": 1,
-            "item_price": 2,
-            "item_total": 3
-        }
-        
-        label = relation_types[sample["relation_type"]]
-        
-        return features, torch.tensor(label)
+1. Create the directory structure:
+```bash
+mkdir -p dataset/images/{train,val,test}
+mkdir -p dataset/annotations/{train,val,test}
 ```
+
+2. Place invoice images in the appropriate folders (train, val, test).
+
+3. Create annotation files for each image following the format above.
+
+#### Example Annotation File (dataset/annotations/train/invoice1.json):
+
+```json
+{
+  "image_path": "images/train/invoice1.jpg",
+  "width": 1000,
+  "height": 1414,
+  "text_blocks": [
+    {
+      "id": 1,
+      "text": "INVOICE #INV-2023-001",
+      "position": {
+        "x_min": 100,
+        "y_min": 50,
+        "x_max": 300,
+        "y_max": 80
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 2,
+      "text": "Date: 2023-10-15",
+      "position": {
+        "x_min": 500,
+        "y_min": 50,
+        "x_max": 650,
+        "y_max": 80
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 3,
+      "text": "John Doe",
+      "position": {
+        "x_min": 100,
+        "y_min": 120,
+        "x_max": 250,
+        "y_max": 150
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 4,
+      "text": "Product A",
+      "position": {
+        "x_min": 100,
+        "y_min": 200,
+        "x_max": 300,
+        "y_max": 230
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 5,
+      "text": "2",
+      "position": {
+        "x_min": 350,
+        "y_min": 200,
+        "x_max": 380,
+        "y_max": 230
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 6,
+      "text": "$10.99",
+      "position": {
+        "x_min": 400,
+        "y_min": 200,
+        "x_max": 450,
+        "y_max": 230
+      },
+      "entity_type": "item_price"
+    }
+  ],
+  "relations": [
+    {
+      "id": 1,
+      "source_id": 4,
+      "target_id": 5,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 4,
+      "target_id": 6,
+      "relation_type": "item_price"
+    }
+  ]
+}
+```
+
+### Creating a Training Dataset from Scratch
+
+For real-world applications, you would typically follow these steps:
+
+1. **Collect Invoice Images**: 
+   - Gather a diverse set of invoice images in different formats and layouts
+   - Include varying fields, vendors, and styles for robust training
+
+2. **Annotation Process**:
+   - Use annotation tools like LabelImg, CVAT, or custom annotation scripts
+   - For each image:
+     a) Identify text blocks using OCR
+     b) Manually label each text block with its entity type
+     c) Define relations between text blocks (e.g., which price belongs to which item)
+   - Save annotations in the specified JSON format
+
+3. **Dataset Splitting**:
+   - Split your dataset into training (70%), validation (15%), and test (15%) sets
+   - Ensure each set contains a diverse range of invoice types
+
+4. **Data Augmentation** (optional):
+   - Generate additional training samples by applying transformations
+   - Techniques include rotation, noise addition, contrast changes, etc.
 
 ### Training the Models
 
@@ -395,7 +365,7 @@ python train.py --data_dir=dataset --output_dir=models --epochs=20 --batch_size=
 ```
 
 Options:
-- `--data_dir`: Directory containing the dataset
+- `--data_dir`: Directory containing the dataset (with the structure as described above)
 - `--output_dir`: Directory to save the trained models
 - `--epochs`: Number of training epochs
 - `--batch_size`: Batch size for training
@@ -404,46 +374,7 @@ Options:
 
 ### Using Trained Models
 
-After training, the models will be saved in the specified output directory. To use them, update the model paths in the code:
-
-```python
-# In src/models/entity_classifier.py
-entity_classifier = EntityClassifier(model_path="models/entity_model.pth")
-
-# In src/models/relation_extractor.py
-relation_extractor = RelationExtractor(model_path="models/relation_model.pth")
-```
-
-## Project Structure
-
-```
-invoice-intellect-extractor/
-├── .devcontainer/                 # DevContainer configuration
-│   ├── devcontainer.json
-│   └── Dockerfile
-├── src/
-│   ├── preprocessing/             # Image preprocessing
-│   │   ├── __init__.py
-│   │   └── image_preprocessor.py
-│   ├── ocr/                       # OCR processing
-│   │   ├── __init__.py
-│   │   └── processor.py
-│   ├── models/                    # Machine learning models
-│   │   ├── __init__.py
-│   │   ├── entity_classifier.py
-│   │   └── relation_extractor.py
-│   ├── utils/                     # Utility functions
-│   │   ├── __init__.py
-│   │   ├── image_utils.py
-│   │   ├── dataset.py             # Dataset classes for training
-│   │   └── data_formatter.py
-│   ├── __init__.py
-│   └── pipeline.py                # Main processing pipeline
-├── app.py                         # Flask application
-├── train.py                       # Model training script
-├── requirements.txt               # Python dependencies
-└── README.md                      # Documentation
-```
+After training, the models will be saved in the specified output directory. The pipeline will automatically use them as long as they're located in the "models" directory.
 
 ## Deployment
 
@@ -505,6 +436,45 @@ server {
 sudo systemctl enable invoice-extractor
 sudo systemctl start invoice-extractor
 sudo systemctl restart nginx
+```
+
+## Project Structure
+
+```
+invoice-intellect-extractor/
+├── .devcontainer/                 # DevContainer configuration
+│   ├── devcontainer.json
+│   └── Dockerfile
+├── src/
+│   ├── preprocessing/             # Image preprocessing
+│   │   ├── __init__.py
+│   │   └── image_preprocessor.py
+│   ├── ocr/                       # OCR processing
+│   │   ├── __init__.py
+│   │   └── processor.py
+│   ├── models/                    # Machine learning models
+│   │   ├── __init__.py
+│   │   ├── entity_classifier.py
+│   │   └── relation_extractor.py
+│   ├── utils/                     # Utility functions
+│   │   ├── __init__.py
+│   │   ├── image_utils.py
+│   │   ├── dataset.py             # Dataset classes for training
+│   │   └── data_formatter.py
+│   ├── components/                # React components
+│   │   ├── FileUpload.tsx
+│   │   └── InvoicePreview.tsx
+│   ├── pages/                     # React pages
+│   │   ├── Index.tsx
+│   │   └── NotFound.tsx
+│   ├── types/                     # TypeScript types
+│   │   └── invoice.ts
+│   ├── __init__.py
+│   └── pipeline.py                # Main processing pipeline
+├── app.py                         # Flask application
+├── train.py                       # Model training script
+├── requirements.txt               # Python dependencies
+└── README.md                      # Documentation
 ```
 
 ## Future Improvements
