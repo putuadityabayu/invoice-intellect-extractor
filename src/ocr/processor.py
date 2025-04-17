@@ -15,9 +15,9 @@ class OCRProcessor:
     def __init__(self):
         """Initialize the OCR processor with doctr model"""
         # Use the doctr pretrained model for OCR
-        self.model = ocr_predictor(pretrained=True)
+        self.model = ocr_predictor("db_resnet50","crnn_mobilenet_v3_large",pretrained=True)
         
-    def extract_text(self, image: np.ndarray) -> List[Dict[str, Any]]:
+    def extract_text(self, image: str) -> List[Dict[str, Any]]:
         """
         Extract text from an image with positional information
         
@@ -28,8 +28,8 @@ class OCRProcessor:
             List of text blocks with text content and position
         """
         # Convert to RGB if grayscale (doctr expects RGB)
-        if len(image.shape) == 2:
-            image = np.stack([image] * 3, axis=-1)
+        # if len(image.shape) == 2:
+        #     image = np.stack([image] * 3, axis=-1)
         
         # Create a document from the image
         doc = DocumentFile.from_images(image)
@@ -51,15 +51,15 @@ class OCRProcessor:
                         # Bounding box is in relative coordinates (0-1)
                         # Format: [xmin, ymin, xmax, ymax]
                         bbox = word.geometry
-                        
+
                         text_blocks.append({
                             "text": text,
                             "confidence": word.confidence,
                             "position": {
-                                "x_min": bbox[0],
-                                "y_min": bbox[1],
-                                "x_max": bbox[2],
-                                "y_max": bbox[3]
+                                "x_min": bbox[0][0],
+                                "y_min": bbox[0][1],
+                                "x_max": bbox[0][1],
+                                "y_max": bbox[1][1]
                             }
                         })
                         
@@ -70,7 +70,7 @@ class OCRProcessor:
 ocr_processor = OCRProcessor()
 
 
-def extract_text_with_positions(image: np.ndarray) -> List[Dict[str, Any]]:
+def extract_text_with_positions(image: str) -> List[Dict[str, Any]]:
     """
     Extract text from an image with positional information
     

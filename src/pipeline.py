@@ -12,8 +12,8 @@ from src.models.relation_extractor import RelationExtractor
 from src.utils.data_formatter import format_invoice_data
 
 # Initialize models (load pre-trained models)
-entity_classifier = EntityClassifier()
-relation_extractor = RelationExtractor()
+entity_classifier = EntityClassifier("models/entity_model.pth")
+relation_extractor = RelationExtractor("models/relation_model.pth")
 
 
 def process_invoice(image_path: str) -> Dict[str, Any]:
@@ -27,10 +27,10 @@ def process_invoice(image_path: str) -> Dict[str, Any]:
         Structured invoice data as a dictionary
     """
     # Step 1: Preprocess the image
-    preprocessed_image = preprocess_image(image_path)
+    # preprocessed_image = preprocess_image(image_path)
     
     # Step 2: Extract text with positions using OCR
-    text_blocks = extract_text_with_positions(preprocessed_image)
+    text_blocks = extract_text_with_positions(image_path)
     
     # Step 3: Classify entities (invoice number, date, customer, etc.)
     classified_entities = entity_classifier.classify(text_blocks)

@@ -65,6 +65,7 @@ class EntityClassifier:
         """
         # Initialize model architecture
         self.model = EntityModel()
+        # self.model_path = "models/entity_model.pth"
         
         # Load model weights if available
         if model_path and torch.cuda.is_available():
@@ -177,6 +178,7 @@ class EntityClassifier:
         
         for i, pred in enumerate(predictions):
             entity_type = self.ENTITY_TYPES[pred.item()]
+            print("entity_type",entity_type)
             
             if entity_type == "invoice_number":
                 entities["invoice_number"] = text_blocks[i]["text"]
@@ -212,6 +214,7 @@ class EntityClassifier:
             Dictionary of classified entities
         """
         if self.use_model:
+            print("use model")
             return self.model_classification(text_blocks)
         else:
             return self.rule_based_classification(text_blocks)

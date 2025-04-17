@@ -1,0 +1,9 @@
+
+{
+  "name": "Invoice Intellect Extractor",
+  "runArgs": ["--name", "ocr_devcontainer"],
+  "forwardPorts": [5000],
+  "build": {
+    "dockerfile":  "Dockerfile.DEV"
+  }
+}
