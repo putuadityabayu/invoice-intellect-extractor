@@ -30,6 +30,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5000
+EXPOSE 3000
 
 # Set Python path
 ENV PYTHONPATH=/app
