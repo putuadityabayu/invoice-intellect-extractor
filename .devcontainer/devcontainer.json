@@ -1,0 +1,23 @@
+
+{
+  "name": "Invoice Intellect Extractor",
+  "dockerFile": "Dockerfile",
+  "forwardPorts": [5000],
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "njpwerner.autodocstring"
+      ],
+      "settings": {
+        "python.formatting.provider": "black",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "postCreateCommand": "pip install --no-cache-dir -r requirements.txt"
+}
