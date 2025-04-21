@@ -1,4 +1,3 @@
-
 """
 Main processing pipeline for invoice data extraction
 """
@@ -7,12 +6,13 @@ from typing import Dict, Any, List
 import os
 import json
 from src.ocr.processor import extract_text_with_positions
-from src.preprocessing.image_preprocessor import preprocess_image
+from src.preprocessing.image_preprocessor import preprocess_image, save_image
 from src.models.entity_classifier import EntityClassifier
 from src.models.relation_extractor import RelationExtractor
 from src.models.layout_model import LayoutExtractor
 from src.utils.data_formatter import format_invoice_data
 import logging
+import cv2
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -46,6 +46,36 @@ entity_classifier = EntityClassifier(
 relation_extractor = RelationExtractor(relation_model_path if relation_model_exists else None)
 layout_extractor = LayoutExtractor(layout_model_path if layout_model_exists else None)
 
+# Create debug directory
+debug_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "debug")
+os.makedirs(debug_dir, exist_ok=True)
+
+
+def save_debug_output(data, filename):
+    """
+    Save data to a debug file
+    
+    Args:
+        data: Data to save
+        filename: Filename to save to
+    """
+    filepath = os.path.join(debug_dir, filename)
+    
+    # Determine file type based on extension
+    ext = os.path.splitext(filename)[1].lower()
+    
+    if ext == '.json':
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2)
+    elif ext == '.txt':
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(str(data))
+    elif ext == '.md':
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(data)
+    
+    logger.info(f"Saved debug output to {filepath}")
+
 
 def process_invoice(image_path: str) -> Dict[str, Any]:
     """
@@ -60,8 +90,15 @@ def process_invoice(image_path: str) -> Dict[str, Any]:
     # Step 1: Preprocess the image
     preprocessed_image = preprocess_image(image_path)
     
+    # Save preprocessed image for debugging
+    save_image(preprocessed_image, os.path.join(debug_dir, "preprocessed_image.jpg"))
+    logger.info(f"Saved preprocessed image to debug/preprocessed_image.jpg")
+    
     # Step 2: Extract text with positions using OCR
     text_blocks = extract_text_with_positions(preprocessed_image)
+    
+    # Save OCR results for debugging
+    save_debug_output(text_blocks, "ocr_results.json")
     
     # Debug: Print the extracted text blocks
     logger.info(f"Extracted {len(text_blocks)} text blocks from the invoice")
@@ -74,20 +111,35 @@ def process_invoice(image_path: str) -> Dict[str, Any]:
     classified_entities = entity_classifier.classify(text_blocks)
     logger.info(f"Entity classifier results: {json.dumps(classified_entities, indent=2)}")
     
+    # Save entity classification results for debugging
+    save_debug_output(classified_entities, "entity_results.json")
+    
     # 3.2: Layout-aware extraction
     layout_results = layout_extractor.process(text_blocks)
     logger.info(f"Layout extractor results: {json.dumps(layout_results, indent=2)}")
+    
+    # Save layout analysis results for debugging
+    save_debug_output(layout_results, "layout_results.json")
     
     # 3.3: Relation extraction for item relationships
     extracted_relations = relation_extractor.extract(text_blocks, classified_entities)
     logger.info(f"Relation extractor results: {json.dumps(extracted_relations, indent=2)}")
     
+    # Save relation extraction results for debugging
+    save_debug_output(extracted_relations, "relation_results.json")
+    
     # Step 4: Combine results from different approaches
     final_results = combine_extraction_results(classified_entities, layout_results, extracted_relations)
     logger.info(f"Combined results: {json.dumps(final_results, indent=2)}")
     
+    # Save combined results for debugging
+    save_debug_output(final_results, "combined_results.json")
+    
     # Step 5: Format the extracted data into the required JSON structure
     formatted_data = format_invoice_data(final_results, extracted_relations)
+    
+    # Save final output for debugging
+    save_debug_output(formatted_data, "final_output.json")
     
     return formatted_data
 

@@ -23,22 +23,7 @@ def download_image_from_url(url: str, save_path: str) -> Tuple[bool, str]:
     Returns:
         Tuple of (success, message)
     """
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()  # Raise an error for bad responses
-        
-        # Check if the content type is an image
-        content_type = response.headers.get('Content-Type', '')
-        if not content_type.startswith('image/'):
-            return False, f"URL does not point to an image: {content_type}"
-        
-        # Save the image
-        with open(save_path, 'wb') as f:
-            f.write(response.content)
-            
-        return True, "Image downloaded successfully"
-    except requests.exceptions.RequestException as e:
-        return False, f"Error downloading image: {str(e)}"
+    # ... keep existing code (download_image_from_url function implementation)
 
 
 def is_valid_image(file_path: str) -> bool:
@@ -51,13 +36,7 @@ def is_valid_image(file_path: str) -> bool:
     Returns:
         True if valid image, False otherwise
     """
-    try:
-        with Image.open(file_path) as img:
-            # Try to verify the image
-            img.verify()
-        return True
-    except:
-        return False
+    # ... keep existing code (is_valid_image function implementation)
 
 
 def load_image(file_path: str) -> Optional[np.ndarray]:
@@ -70,10 +49,7 @@ def load_image(file_path: str) -> Optional[np.ndarray]:
     Returns:
         Image as numpy array or None if failed
     """
-    try:
-        return cv2.imread(file_path)
-    except:
-        return None
+    # ... keep existing code (load_image function implementation)
 
 
 def save_image(image: np.ndarray, file_path: str) -> bool:
@@ -90,5 +66,50 @@ def save_image(image: np.ndarray, file_path: str) -> bool:
     try:
         cv2.imwrite(file_path, image)
         return True
-    except:
+    except Exception as e:
+        print(f"Error saving image: {e}")
+        return False
+
+
+def save_debug_info(data: any, file_path: str, format_type: str = "auto") -> bool:
+    """
+    Save debug information to a file
+    
+    Args:
+        data: Data to save
+        file_path: Path to save the file
+        format_type: Type of format to save as ('json', 'txt', 'md', or 'auto')
+        
+    Returns:
+        True if saved successfully, False otherwise
+    """
+    try:
+        # Determine format type if auto
+        if format_type == "auto":
+            ext = os.path.splitext(file_path)[1].lower()
+            if ext == '.json':
+                format_type = "json"
+            elif ext == '.md':
+                format_type = "md"
+            else:
+                format_type = "txt"
+        
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        
+        # Save data in the appropriate format
+        if format_type == "json":
+            import json
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2)
+        elif format_type == "md":
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(data)
+        else:  # txt
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(str(data))
+                
+        return True
+    except Exception as e:
+        print(f"Error saving debug info: {e}")
         return False

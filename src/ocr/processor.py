@@ -4,6 +4,8 @@ OCR processor using doctr for text extraction with positional information
 """
 
 import numpy as np
+import os
+import json
 from typing import List, Dict, Any, Tuple
 from doctr.io import DocumentFile
 from doctr.models import ocr_predictor
@@ -27,10 +29,6 @@ class OCRProcessor:
         Returns:
             List of text blocks with text content and position
         """
-        # Convert to RGB if grayscale (doctr expects RGB)
-        # if len(image.shape) == 2:
-        #     image = np.stack([image] * 3, axis=-1)
-        
         # Create a document from the image
         doc = DocumentFile.from_images(image)
         
@@ -58,7 +56,7 @@ class OCRProcessor:
                             "position": {
                                 "x_min": bbox[0][0],
                                 "y_min": bbox[0][1],
-                                "x_max": bbox[0][1],
+                                "x_max": bbox[1][0],
                                 "y_max": bbox[1][1]
                             }
                         })
@@ -80,4 +78,23 @@ def extract_text_with_positions(image: str) -> List[Dict[str, Any]]:
     Returns:
         List of text blocks with text content and position
     """
-    return ocr_processor.extract_text(image)
+    results = ocr_processor.extract_text(image)
+    
+    # Create a visual debug output
+    debug_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "debug")
+    os.makedirs(debug_dir, exist_ok=True)
+    
+    # Save raw OCR results as text with positions
+    ocr_visual_output = ""
+    for block in results:
+        text = block["text"]
+        pos = block["position"]
+        confidence = block["confidence"]
+        ocr_visual_output += f"Text: '{text}' (conf: {confidence:.2f})\n"
+        ocr_visual_output += f"Position: x_min={pos['x_min']:.3f}, y_min={pos['y_min']:.3f}, "
+        ocr_visual_output += f"x_max={pos['x_max']:.3f}, y_max={pos['y_max']:.3f}\n\n"
+    
+    with open(os.path.join(debug_dir, "ocr_visual_results.txt"), "w", encoding="utf-8") as f:
+        f.write(ocr_visual_output)
+    
+    return results
