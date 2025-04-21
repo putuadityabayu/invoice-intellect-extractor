@@ -1,4 +1,3 @@
-
 """
 Relation extractor model to identify relationships between entities (e.g., item details)
 """
@@ -112,146 +111,18 @@ class RelationExtractor:
         self, text_blocks: List[Dict[str, Any]], entities: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
-        Apply rule-based relation extraction
-        
-        Args:
-            text_blocks: List of text blocks with text and position
-            entities: Classified entities
-            
-        Returns:
-            Dictionary with extracted relations
+        Disabling manual rule-based extraction.
+        Return entitas/relasi kosong agar pipeline hanya mengandalkan output model ML.
         """
-        # Enhanced entities structure to store the extracted relations
-        relations = {
-            "invoice_number": entities.get("invoice_number"),
-            "invoice_date": entities.get("invoice_date"),
-            "name": entities.get("customer_name"),
+        return {
+            "invoice_number": None,
+            "invoice_date": None,
+            "name": None,
             "items": [],
             "subtotal": None,
             "extra_price": [],
             "total": None
         }
-        
-        # Extract subtotal
-        if entities.get("subtotal"):
-            relations["subtotal"] = self.extract_price(entities["subtotal"])
-            
-        # Extract total
-        if entities.get("total"):
-            relations["total"] = self.extract_price(entities["total"])
-            
-        # Process extra price items
-        for extra in entities.get("extra_price", []):
-            price = self.extract_price(extra)
-            if price:
-                # Try to determine the type of extra price
-                if "tax" in extra.lower():
-                    relations["extra_price"].append({"tax": price})
-                elif "discount" in extra.lower():
-                    relations["extra_price"].append({"discount": price})
-                elif "shipping" in extra.lower():
-                    relations["extra_price"].append({"shipping": price})
-                else:
-                    relations["extra_price"].append({"other": price})
-        
-        # Identify table structure for items
-        # This is a simplified approach; a real implementation would use positional information
-        potential_items = []
-        for i, block in enumerate(text_blocks):
-            text = block["text"]
-            position = block["position"]
-            
-            # Skip likely header texts
-            if any(header in text.lower() for header in ["invoice", "bill", "customer", "date"]):
-                continue
-                
-            # Check if text might be a quantity (number only or with units)
-            quantity_match = re.search(r'\b\d+\b', text)
-            if quantity_match:
-                potential_items.append({
-                    "index": i,
-                    "text": text,
-                    "position": position,
-                    "potential_quantity": int(quantity_match.group())
-                })
-                continue
-                
-            # Check if text might be a price (has currency symbol or decimal)
-            price_match = re.search(r'[$€£¥]?\d+(\.\d{2})?', text)
-            if price_match:
-                potential_items.append({
-                    "index": i,
-                    "text": text,
-                    "position": position,
-                    "potential_price": self.extract_price(text)
-                })
-                continue
-                
-            # If not quantity or price, might be item name
-            potential_items.append({
-                "index": i,
-                "text": text,
-                "position": position,
-                "potential_name": text
-            })
-        
-        # Group items by y-position (assuming items are in rows)
-        # This is simplified; real implementation would use more sophisticated clustering
-        rows = {}
-        for item in potential_items:
-            y_center = (item["position"]["y_min"] + item["position"]["y_max"]) / 2
-            # Group by rounding to nearest 0.05 to account for slight misalignments
-            row_key = round(y_center * 20) / 20
-            if row_key not in rows:
-                rows[row_key] = []
-            rows[row_key].append(item)
-        
-        # Process each row as a potential item
-        for row_key, row_items in rows.items():
-            # Skip rows with too few elements (likely not an item row)
-            if len(row_items) < 2:
-                continue
-                
-            # Try to identify item components
-            item = {
-                "name": "",
-                "quantity": 0,
-                "unit_price": 0.0,
-                "total_price": 0.0
-            }
-            
-            # Sort by x position
-            row_items.sort(key=lambda x: x["position"]["x_min"])
-            
-            # Assign components based on position and content
-            for i, component in enumerate(row_items):
-                # First component is usually item name
-                if i == 0 and "potential_name" in component:
-                    item["name"] = component["text"]
-                    
-                # Check for quantity
-                elif "potential_quantity" in component:
-                    item["quantity"] = component["potential_quantity"]
-                    
-                # Check for prices
-                elif "potential_price" in component:
-                    # Last price in a row is typically the total
-                    if i == len(row_items) - 1:
-                        item["total_price"] = component["potential_price"]
-                    else:
-                        item["unit_price"] = component["potential_price"]
-            
-            # If we have at least a name and one numeric value, consider it a valid item
-            if item["name"] and (item["quantity"] or item["unit_price"] or item["total_price"]):
-                # Calculate missing values if possible
-                if item["quantity"] and item["unit_price"] and not item["total_price"]:
-                    item["total_price"] = item["quantity"] * item["unit_price"]
-                elif item["quantity"] and item["total_price"] and not item["unit_price"]:
-                    item["unit_price"] = item["total_price"] / item["quantity"]
-                    
-                relations["items"].append(item)
-        
-        return relations
     
     def model_extraction(
         self, text_blocks: List[Dict[str, Any]], entities: Dict[str, Any]

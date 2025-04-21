@@ -1,4 +1,3 @@
-
 """
 Entity classifier model to identify invoice elements using both neural networks and NER
 """
@@ -174,14 +173,10 @@ class EntityClassifier:
     def rule_based_classification(self, text_blocks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Apply rule-based classification for entities
-        
-        Args:
-            text_blocks: List of text blocks with text and position
-            
-        Returns:
-            Dictionary of classified entities
+
+        NOTE: Di-nonaktifkan, return kosong supaya pipeline hanya mengandalkan hasil prediksi model ML (tanpa regex/manual pattern-matching)
         """
-        entities = {
+        return {
             "invoice_number": None,
             "invoice_date": None,
             "customer_name": None,
@@ -190,41 +185,6 @@ class EntityClassifier:
             "total": None,
             "extra_price": []
         }
-        
-        # Simple rule-based approach using keywords
-        for block in text_blocks:
-            text = block["text"].lower()
-            
-            # Invoice number detection
-            if "invoice" in text and ("#" in text or "no" in text or "number" in text):
-                # Extract numeric part or entire text as invoice number
-                entities["invoice_number"] = block["text"]
-                
-            # Date detection using regex patterns
-            elif (
-                any(date_keyword in text for date_keyword in ["date", "issued", "due"]) or
-                re.search(r'\d{1,2}[/\-\.]\d{1,2}[/\-\.]\d{2,4}', text) or  # DD/MM/YYYY
-                re.search(r'\d{2,4}[/\-\.]\d{1,2}[/\-\.]\d{1,2}', text)     # YYYY/MM/DD
-            ):
-                entities["invoice_date"] = block["text"]
-                
-            # Customer detection
-            elif any(customer_keyword in text for customer_keyword in ["customer", "bill to", "client"]):
-                entities["customer_name"] = block["text"]
-                
-            # Subtotal detection
-            elif "subtotal" in text or "sub-total" in text or "sub total" in text:
-                entities["subtotal"] = block["text"]
-                
-            # Total detection
-            elif ("total" in text and not any(x in text for x in ["subtotal", "sub-total", "sub total"])) or "amount due" in text:
-                entities["total"] = block["text"]
-                
-            # Tax or extra pricing detection
-            elif any(tax_keyword in text for tax_keyword in ["tax", "vat", "gst", "discount", "shipping"]):
-                entities["extra_price"].append(block["text"])
-                
-        return entities
     
     def spacy_ner_classification(self, text_blocks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """

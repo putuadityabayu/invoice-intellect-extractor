@@ -1,0 +1,79 @@
+
+{
+  "image_path": "images/train/invoice_multilang_2.jpg",
+  "width": 1000,
+  "height": 1400,
+  "text_blocks": [
+    {
+      "id": 1,
+      "text": "Fattura n°: IT-1002",
+      "position": { "x_min": 120, "y_min": 140, "x_max": 300, "y_max": 165 },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 2,
+      "text": "Data: 21-03-2023",
+      "position": { "x_min": 120, "y_min": 180, "x_max": 300, "y_max": 205 },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 3,
+      "text": "Cliente: Mario Rossi",
+      "position": { "x_min": 120, "y_min": 240, "x_max": 450, "y_max": 265 },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 4,
+      "text": "Tablet",
+      "position": { "x_min": 120, "y_min": 320, "x_max": 400, "y_max": 345 },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 5,
+      "text": "1",
+      "position": { "x_min": 500, "y_min": 320, "x_max": 550, "y_max": 345 },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 6,
+      "text": "€455,00",
+      "position": { "x_min": 600, "y_min": 320, "x_max": 700, "y_max": 345 },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 7,
+      "text": "€455,00",
+      "position": { "x_min": 800, "y_min": 320, "x_max": 940, "y_max": 345 },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 8,
+      "text": "Totale parziale: €455,00",
+      "position": { "x_min": 800, "y_min": 410, "x_max": 940, "y_max": 435 },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 9,
+      "text": "IVA 22%: €100,10",
+      "position": { "x_min": 800, "y_min": 450, "x_max": 940, "y_max": 475 },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 10,
+      "text": "Totale: €555,10",
+      "position": { "x_min": 800, "y_min": 490, "x_max": 940, "y_max": 515 },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 1, "source_id": 4, "target_id": 5, "relation_type": "item_quantity"
+    },
+    {
+      "id": 2, "source_id": 4, "target_id": 6, "relation_type": "item_price"
+    },
+    {
+      "id": 3, "source_id": 4, "target_id": 7, "relation_type": "item_total"
+    }
+  ]
+}

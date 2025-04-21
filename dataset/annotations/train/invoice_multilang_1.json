@@ -1,0 +1,79 @@
+
+{
+  "image_path": "images/train/invoice_multilang_1.jpg",
+  "width": 1000,
+  "height": 1400,
+  "text_blocks": [
+    {
+      "id": 1,
+      "text": "Factura n.º: ES-2023-001",
+      "position": { "x_min": 100, "y_min": 160, "x_max": 350, "y_max": 190 },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 2,
+      "text": "Fecha: 15/02/2023",
+      "position": { "x_min": 100, "y_min": 200, "x_max": 350, "y_max": 225 },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 3,
+      "text": "Cliente: Ana García",
+      "position": { "x_min": 100, "y_min": 260, "x_max": 500, "y_max": 285 },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 4,
+      "text": "Portátil",
+      "position": { "x_min": 100, "y_min": 400, "x_max": 400, "y_max": 425 },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 5,
+      "text": "2",
+      "position": { "x_min": 500, "y_min": 400, "x_max": 550, "y_max": 425 },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 6,
+      "text": "€999,99",
+      "position": { "x_min": 600, "y_min": 400, "x_max": 700, "y_max": 425 },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 7,
+      "text": "€1999,98",
+      "position": { "x_min": 800, "y_min": 400, "x_max": 940, "y_max": 425 },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 8,
+      "text": "Subtotal: €1999,98",
+      "position": { "x_min": 800, "y_min": 500, "x_max": 940, "y_max": 525 },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 9,
+      "text": "IVA 21%: €419,99",
+      "position": { "x_min": 800, "y_min": 540, "x_max": 940, "y_max": 565 },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 10,
+      "text": "Total: €2419,97",
+      "position": { "x_min": 800, "y_min": 580, "x_max": 940, "y_max": 605 },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 1, "source_id": 4, "target_id": 5, "relation_type": "item_quantity"
+    },
+    {
+      "id": 2, "source_id": 4, "target_id": 6, "relation_type": "item_price"
+    },
+    {
+      "id": 3, "source_id": 4, "target_id": 7, "relation_type": "item_total"
+    }
+  ]
+}
