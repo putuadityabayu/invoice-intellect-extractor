@@ -19,7 +19,12 @@ pytorch-lightning==2.0.6
 torch==2.0.1
 torchvision==0.15.2
 transformers==4.32.1
+spacy==3.6.1
+
+# NLP
+tqdm==4.66.1
 
 # Utilities
 python-dotenv==1.0.0
 requests==2.31.0
+

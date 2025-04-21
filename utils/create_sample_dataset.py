@@ -1,388 +1,723 @@
 
 """
-Script to create a sample dataset for training the invoice extraction models
+Utility script for creating a sample dataset for training invoice extraction models
 """
 
 import os
 import json
-import shutil
 import random
+import shutil
+import argparse
 from PIL import Image, ImageDraw, ImageFont
+import numpy as np
 from datetime import datetime, timedelta
+import re
+import uuid
 
-# Configuration
-OUTPUT_DIR = "dataset"
-NUM_TRAIN_SAMPLES = 10
-NUM_VAL_SAMPLES = 3
-NUM_TEST_SAMPLES = 3
-IMAGE_WIDTH = 1000
-IMAGE_HEIGHT = 1400
-
-# Ensure the output directory exists
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-os.makedirs(os.path.join(OUTPUT_DIR, "images", "train"), exist_ok=True)
-os.makedirs(os.path.join(OUTPUT_DIR, "images", "val"), exist_ok=True)
-os.makedirs(os.path.join(OUTPUT_DIR, "images", "test"), exist_ok=True)
-os.makedirs(os.path.join(OUTPUT_DIR, "annotations", "train"), exist_ok=True)
-os.makedirs(os.path.join(OUTPUT_DIR, "annotations", "val"), exist_ok=True)
-os.makedirs(os.path.join(OUTPUT_DIR, "annotations", "test"), exist_ok=True)
-
-# Sample data
-COMPANY_NAMES = ["ABC Corp", "XYZ Inc", "Tech Solutions", "Global Services", "Modern Shop"]
-CUSTOMER_NAMES = ["John Doe", "Jane Smith", "Robert Johnson", "Sarah Williams", "Michael Brown"]
-PRODUCTS = [
-    {"name": "Laptop", "price": 1299.99},
-    {"name": "Smartphone", "price": 799.99},
-    {"name": "Tablet", "price": 349.99},
-    {"name": "Monitor", "price": 249.99},
-    {"name": "Keyboard", "price": 59.99},
-    {"name": "Mouse", "price": 29.99},
-    {"name": "Headphones", "price": 129.99},
-    {"name": "Printer", "price": 199.99},
+# Constants
+CANVAS_WIDTH = 2000
+CANVAS_HEIGHT = 2800
+BASE_FONT_SIZE = 36
+HEADER_FONT_SIZE = 48
+COMPANY_NAMES = [
+    "Acme Corporation", "Globex Industries", "Stark Enterprises", "Wayne Enterprises",
+    "Umbrella Corp", "Cyberdyne Systems", "Oscorp Industries", "LexCorp",
+    "Massive Dynamic", "Soylent Corp", "Aperture Science", "Tyrell Corporation"
+]
+CUSTOMER_NAMES = [
+    "John Smith", "Jane Doe", "Robert Johnson", "Emily Williams", 
+    "Michael Brown", "Sarah Davis", "David Miller", "Jennifer Wilson",
+    "ABC Company", "XYZ Ltd", "123 Industries", "Tech Solutions Inc."
+]
+PRODUCT_NAMES = [
+    "Premium Widget", "Standard Gadget", "Deluxe Sprocket", "Basic Connector",
+    "Advanced Mechanism", "Ultra Processor", "Essential Component", "Professional Tool",
+    "Consulting Services", "Software License", "Maintenance Contract", "Technical Support"
 ]
 
-def create_invoice_image(image_path, invoice_number, invoice_date, customer_name, items):
-    """Create a simple invoice image with the given data"""
-    # Create a blank white image
-    image = Image.new("RGB", (IMAGE_WIDTH, IMAGE_HEIGHT), "white")
-    draw = ImageDraw.Draw(image)
-    
-    try:
-        # Try to load a font, fall back to default if not available
-        font_large = ImageFont.truetype("arial.ttf", 36)
-        font_medium = ImageFont.truetype("arial.ttf", 24)
-        font_small = ImageFont.truetype("arial.ttf", 18)
-    except IOError:
-        # Use default font if arial.ttf is not available
-        font_large = ImageFont.load_default()
-        font_medium = ImageFont.load_default()
-        font_small = ImageFont.load_default()
-    
-    # Draw company name
-    company_name = random.choice(COMPANY_NAMES)
-    draw.text((100, 50), company_name, font=font_large, fill="black")
-    
-    # Draw invoice title and number
-    draw.text((100, 120), "INVOICE", font=font_medium, fill="black")
-    inv_num_text = f"Invoice #: {invoice_number}"
-    draw.text((100, 160), inv_num_text, font=font_small, fill="black")
-    
-    # Draw date
-    date_text = f"Date: {invoice_date}"
-    draw.text((100, 190), date_text, font=font_small, fill="black")
-    
-    # Draw customer info
-    draw.text((100, 240), "Bill To:", font=font_small, fill="black")
-    draw.text((100, 270), customer_name, font=font_small, fill="black")
-    
-    # Draw items header
-    draw.text((100, 350), "Description", font=font_small, fill="black")
-    draw.text((500, 350), "Quantity", font=font_small, fill="black")
-    draw.text((600, 350), "Unit Price", font=font_small, fill="black")
-    draw.text((750, 350), "Total", font=font_small, fill="black")
-    
-    # Draw separator line
-    draw.line([(100, 380), (900, 380)], fill="black", width=2)
-    
-    # Draw items
-    y_position = 400
-    subtotal = 0
-    
-    for item in items:
-        name = item["name"]
-        quantity = item["quantity"]
-        unit_price = item["price"]
-        total_price = quantity * unit_price
-        subtotal += total_price
-        
-        draw.text((100, y_position), name, font=font_small, fill="black")
-        draw.text((500, y_position), str(quantity), font=font_small, fill="black")
-        draw.text((600, y_position), f"${unit_price:.2f}", font=font_small, fill="black")
-        draw.text((750, y_position), f"${total_price:.2f}", font=font_small, fill="black")
-        
-        y_position += 40
-    
-    # Draw separator line
-    draw.line([(600, y_position + 20), (900, y_position + 20)], fill="black", width=1)
-    
-    # Draw subtotal
-    draw.text((650, y_position + 40), "Subtotal:", font=font_small, fill="black")
-    draw.text((750, y_position + 40), f"${subtotal:.2f}", font=font_small, fill="black")
-    
-    # Calculate tax (10%)
-    tax = subtotal * 0.1
-    draw.text((650, y_position + 70), "Tax (10%):", font=font_small, fill="black")
-    draw.text((750, y_position + 70), f"${tax:.2f}", font=font_small, fill="black")
-    
-    # Calculate total
-    total = subtotal + tax
-    draw.text((650, y_position + 110), "Total:", font=font_medium, fill="black")
-    draw.text((750, y_position + 110), f"${total:.2f}", font=font_medium, fill="black")
-    
-    # Save the image
-    image.save(image_path)
-    
-    return {
-        "company_name": company_name,
-        "invoice_number": invoice_number,
-        "invoice_date": invoice_date,
-        "customer_name": customer_name,
-        "items": items,
-        "subtotal": subtotal,
-        "tax": tax,
-        "total": total,
-        "positions": {
-            "invoice_number": {"x_min": 100, "y_min": 160, "x_max": 300, "y_max": 185},
-            "invoice_date": {"x_min": 100, "y_min": 190, "x_max": 300, "y_max": 215},
-            "customer_name": {"x_min": 100, "y_min": 270, "x_max": 400, "y_max": 295},
-            "items_start_y": 400,
-            "item_height": 40,
-            "subtotal": {"x_min": 750, "y_min": y_position + 40, "x_max": 850, "y_max": y_position + 65},
-            "tax": {"x_min": 750, "y_min": y_position + 70, "x_max": 850, "y_max": y_position + 95},
-            "total": {"x_min": 750, "y_min": y_position + 110, "x_max": 850, "y_max": y_position + 135}
-        }
-    }
 
-def create_annotation_file(image_data, relative_image_path, output_path):
-    """Create an annotation file in the required format"""
+def generate_invoice_number():
+    """Generate a random invoice number"""
+    prefixes = ["INV", "I", "INVOICE", ""]
+    separators = ["-", "", "/", "#"]
     
-    # Initialize lists for text blocks and relations
+    prefix = random.choice(prefixes)
+    separator = random.choice(separators)
+    number = random.randint(1000, 9999)
+    year = random.randint(2020, 2023)
+    
+    formats = [
+        f"{prefix}{separator}{number}",
+        f"{prefix}{separator}{year}{separator}{number}",
+        f"{prefix}{separator}{number}{separator}{year}",
+        f"{year}{separator}{number}",
+        f"{number}"
+    ]
+    
+    return random.choice(formats)
+
+
+def generate_date():
+    """Generate a random invoice date"""
+    today = datetime.now()
+    days_back = random.randint(1, 365)
+    invoice_date = today - timedelta(days=days_back)
+    
+    formats = [
+        invoice_date.strftime("%Y-%m-%d"),
+        invoice_date.strftime("%d/%m/%Y"),
+        invoice_date.strftime("%m/%d/%Y"),
+        invoice_date.strftime("%d-%m-%Y"),
+        invoice_date.strftime("%d.%m.%Y"),
+        invoice_date.strftime("%B %d, %Y")
+    ]
+    
+    return random.choice(formats)
+
+
+def generate_items(count=None):
+    """Generate random invoice items"""
+    if count is None:
+        count = random.randint(1, 5)
+    
+    items = []
+    
+    for _ in range(count):
+        name = random.choice(PRODUCT_NAMES)
+        quantity = random.randint(1, 10)
+        unit_price = round(random.uniform(10, 500), 2)
+        total_price = round(quantity * unit_price, 2)
+        
+        items.append({
+            "name": name,
+            "quantity": quantity,
+            "unit_price": unit_price,
+            "total_price": total_price
+        })
+    
+    return items
+
+
+def calculate_totals(items):
+    """Calculate subtotal, tax, and total"""
+    subtotal = sum(item["total_price"] for item in items)
+    tax_rate = random.uniform(0.05, 0.25)
+    tax = round(subtotal * tax_rate, 2)
+    total = round(subtotal + tax, 2)
+    
+    return subtotal, tax, total
+
+
+def create_invoice_image(invoice_data, output_path):
+    """Create an invoice image with the given data"""
+    # Create canvas
+    canvas = Image.new('RGB', (CANVAS_WIDTH, CANVAS_HEIGHT), (255, 255, 255))
+    draw = ImageDraw.Draw(canvas)
+    
+    # Try to load fonts
+    try:
+        header_font = ImageFont.truetype("Arial Bold.ttf", HEADER_FONT_SIZE)
+        regular_font = ImageFont.truetype("Arial.ttf", BASE_FONT_SIZE)
+        bold_font = ImageFont.truetype("Arial Bold.ttf", BASE_FONT_SIZE)
+    except IOError:
+        # Fallback to default font
+        header_font = ImageFont.load_default()
+        regular_font = ImageFont.load_default()
+        bold_font = ImageFont.load_default()
+    
+    # Company header
+    y_position = 100
+    company_name = invoice_data["company_name"]
+    draw.text((100, y_position), company_name, fill=(0, 0, 0), font=header_font)
+    y_position += 80
+    
+    # Invoice details
+    draw.text((100, y_position), "INVOICE", fill=(0, 0, 0), font=bold_font)
+    y_position += 50
+    
+    # Two column layout
+    left_column = 100
+    right_column = CANVAS_WIDTH - 400
+    
+    # Invoice number and date
+    draw.text((left_column, y_position), f"Invoice Number:", fill=(0, 0, 0), font=bold_font)
+    draw.text((left_column + 300, y_position), invoice_data["invoice_number"], fill=(0, 0, 0), font=regular_font)
+    
+    draw.text((right_column, y_position), f"Date:", fill=(0, 0, 0), font=bold_font)
+    draw.text((right_column + 150, y_position), invoice_data["invoice_date"], fill=(0, 0, 0), font=regular_font)
+    y_position += 80
+    
+    # Customer section
+    draw.text((left_column, y_position), "Bill To:", fill=(0, 0, 0), font=bold_font)
+    y_position += 50
+    draw.text((left_column, y_position), invoice_data["customer_name"], fill=(0, 0, 0), font=regular_font)
+    y_position += 100
+    
+    # Items table
+    table_headers = ["Item", "Quantity", "Unit Price", "Total"]
+    col_widths = [800, 200, 300, 300]
+    col_positions = [left_column]
+    for width in col_widths[:-1]:
+        col_positions.append(col_positions[-1] + width)
+    
+    # Table header
+    for i, header in enumerate(table_headers):
+        draw.text((col_positions[i], y_position), header, fill=(0, 0, 0), font=bold_font)
+    
+    y_position += 50
+    
+    # Table divider
+    draw.line([(left_column, y_position), (col_positions[-1] + col_widths[-1], y_position)], 
+              fill=(200, 200, 200), width=2)
+    y_position += 20
+    
+    # Table rows
+    for item in invoice_data["items"]:
+        draw.text((col_positions[0], y_position), item["name"], fill=(0, 0, 0), font=regular_font)
+        draw.text((col_positions[1], y_position), str(item["quantity"]), fill=(0, 0, 0), font=regular_font)
+        draw.text((col_positions[2], y_position), f"${item['unit_price']:.2f}", fill=(0, 0, 0), font=regular_font)
+        draw.text((col_positions[3], y_position), f"${item['total_price']:.2f}", fill=(0, 0, 0), font=regular_font)
+        y_position += 60
+    
+    # Table divider
+    draw.line([(left_column, y_position), (col_positions[-1] + col_widths[-1], y_position)], 
+              fill=(200, 200, 200), width=2)
+    y_position += 40
+    
+    # Summary
+    summary_x = col_positions[2]
+    
+    draw.text((summary_x, y_position), "Subtotal:", fill=(0, 0, 0), font=bold_font)
+    draw.text((col_positions[3], y_position), f"${invoice_data['subtotal']:.2f}", fill=(0, 0, 0), font=regular_font)
+    y_position += 50
+    
+    tax_label = f"Tax ({invoice_data['tax_rate']*100:.0f}%):"
+    draw.text((summary_x, y_position), tax_label, fill=(0, 0, 0), font=bold_font)
+    draw.text((col_positions[3], y_position), f"${invoice_data['tax']:.2f}", fill=(0, 0, 0), font=regular_font)
+    y_position += 50
+    
+    # Total
+    draw.text((summary_x, y_position), "Total:", fill=(0, 0, 0), font=bold_font)
+    draw.text((col_positions[3], y_position), f"${invoice_data['total']:.2f}", fill=(0, 0, 0), font=bold_font)
+    
+    # Save image
+    canvas.save(output_path)
+    print(f"Created invoice image: {output_path}")
+    
+    return canvas
+
+
+def extract_text_blocks(canvas, invoice_data):
+    """
+    Extract text blocks from the invoice canvas
+    
+    This simulates OCR by using the known positions and text
+    """
     text_blocks = []
-    relations = []
-    block_id = 1
+    block_id = 0
     
-    # Add invoice number
+    # Company header
+    y_position = 100
     text_blocks.append({
         "id": block_id,
-        "text": f"Invoice #: {image_data['invoice_number']}",
-        "position": image_data["positions"]["invoice_number"],
+        "text": invoice_data["company_name"],
+        "position": {
+            "x_min": 100,
+            "y_min": y_position,
+            "x_max": 800,
+            "y_max": y_position + 60
+        },
+        "entity_type": "company_name"
+    })
+    block_id += 1
+    y_position += 80
+    
+    # Invoice label
+    text_blocks.append({
+        "id": block_id,
+        "text": "INVOICE",
+        "position": {
+            "x_min": 100,
+            "y_min": y_position,
+            "x_max": 300,
+            "y_max": y_position + 50
+        },
+        "entity_type": "label"
+    })
+    block_id += 1
+    y_position += 50
+    
+    # Left column
+    left_column = 100
+    right_column = CANVAS_WIDTH - 400
+    
+    # Invoice number label
+    text_blocks.append({
+        "id": block_id,
+        "text": "Invoice Number:",
+        "position": {
+            "x_min": left_column,
+            "y_min": y_position,
+            "x_max": left_column + 300,
+            "y_max": y_position + 40
+        },
+        "entity_type": "label"
+    })
+    block_id += 1
+    
+    # Invoice number value
+    text_blocks.append({
+        "id": block_id,
+        "text": invoice_data["invoice_number"],
+        "position": {
+            "x_min": left_column + 300,
+            "y_min": y_position,
+            "x_max": left_column + 600,
+            "y_max": y_position + 40
+        },
         "entity_type": "invoice_number"
     })
     block_id += 1
     
-    # Add invoice date
+    # Date label
     text_blocks.append({
         "id": block_id,
-        "text": f"Date: {image_data['invoice_date']}",
-        "position": image_data["positions"]["invoice_date"],
+        "text": "Date:",
+        "position": {
+            "x_min": right_column,
+            "y_min": y_position,
+            "x_max": right_column + 150,
+            "y_max": y_position + 40
+        },
+        "entity_type": "label"
+    })
+    block_id += 1
+    
+    # Date value
+    text_blocks.append({
+        "id": block_id,
+        "text": invoice_data["invoice_date"],
+        "position": {
+            "x_min": right_column + 150,
+            "y_min": y_position,
+            "x_max": right_column + 450,
+            "y_max": y_position + 40
+        },
         "entity_type": "invoice_date"
     })
     block_id += 1
+    y_position += 80
     
-    # Add customer name
+    # Bill To label
     text_blocks.append({
         "id": block_id,
-        "text": image_data["customer_name"],
-        "position": image_data["positions"]["customer_name"],
+        "text": "Bill To:",
+        "position": {
+            "x_min": left_column,
+            "y_min": y_position,
+            "x_max": left_column + 200,
+            "y_max": y_position + 40
+        },
+        "entity_type": "label"
+    })
+    block_id += 1
+    y_position += 50
+    
+    # Customer name
+    text_blocks.append({
+        "id": block_id,
+        "text": invoice_data["customer_name"],
+        "position": {
+            "x_min": left_column,
+            "y_min": y_position,
+            "x_max": left_column + 500,
+            "y_max": y_position + 40
+        },
         "entity_type": "customer_name"
     })
     block_id += 1
+    y_position += 100
     
-    # Add items
-    for i, item in enumerate(image_data["items"]):
-        item_y = image_data["positions"]["items_start_y"] + (i * image_data["positions"]["item_height"])
-        
-        # Item name
-        item_name_id = block_id
+    # Table headers
+    table_headers = ["Item", "Quantity", "Unit Price", "Total"]
+    col_widths = [800, 200, 300, 300]
+    col_positions = [left_column]
+    for width in col_widths[:-1]:
+        col_positions.append(col_positions[-1] + width)
+    
+    for i, header in enumerate(table_headers):
         text_blocks.append({
-            "id": item_name_id,
+            "id": block_id,
+            "text": header,
+            "position": {
+                "x_min": col_positions[i],
+                "y_min": y_position,
+                "x_max": col_positions[i] + col_widths[i],
+                "y_max": y_position + 40
+            },
+            "entity_type": "table_header"
+        })
+        block_id += 1
+    
+    y_position += 70
+    
+    # Table rows
+    item_blocks = []
+    for item in invoice_data["items"]:
+        # Item name
+        item_name_block = {
+            "id": block_id,
             "text": item["name"],
             "position": {
-                "x_min": 100, 
-                "y_min": item_y, 
-                "x_max": 400, 
-                "y_max": item_y + 25
+                "x_min": col_positions[0],
+                "y_min": y_position,
+                "x_max": col_positions[0] + col_widths[0],
+                "y_max": y_position + 40
             },
             "entity_type": "item_name"
-        })
+        }
+        text_blocks.append(item_name_block)
+        item_blocks.append(item_name_block)
         block_id += 1
         
-        # Item quantity
-        quantity_id = block_id
-        text_blocks.append({
-            "id": quantity_id,
+        # Quantity
+        quantity_block = {
+            "id": block_id,
             "text": str(item["quantity"]),
             "position": {
-                "x_min": 500, 
-                "y_min": item_y, 
-                "x_max": 550, 
-                "y_max": item_y + 25
+                "x_min": col_positions[1],
+                "y_min": y_position,
+                "x_max": col_positions[1] + col_widths[1],
+                "y_max": y_position + 40
             },
             "entity_type": "item_quantity"
-        })
+        }
+        text_blocks.append(quantity_block)
         block_id += 1
         
-        # Item price
-        price_id = block_id
-        text_blocks.append({
-            "id": price_id,
-            "text": f"${item['price']:.2f}",
+        # Unit price
+        unit_price_block = {
+            "id": block_id,
+            "text": f"${item['unit_price']:.2f}",
             "position": {
-                "x_min": 600, 
-                "y_min": item_y, 
-                "x_max": 670, 
-                "y_max": item_y + 25
+                "x_min": col_positions[2],
+                "y_min": y_position,
+                "x_max": col_positions[2] + col_widths[2],
+                "y_max": y_position + 40
             },
             "entity_type": "item_price"
-        })
+        }
+        text_blocks.append(unit_price_block)
         block_id += 1
         
-        # Item total
-        total_id = block_id
-        text_blocks.append({
-            "id": total_id,
-            "text": f"${item['quantity'] * item['price']:.2f}",
+        # Total price
+        total_price_block = {
+            "id": block_id,
+            "text": f"${item['total_price']:.2f}",
             "position": {
-                "x_min": 750, 
-                "y_min": item_y, 
-                "x_max": 850, 
-                "y_max": item_y + 25
+                "x_min": col_positions[3],
+                "y_min": y_position,
+                "x_max": col_positions[3] + col_widths[3],
+                "y_max": y_position + 40
             },
-            "entity_type": "item_price"
-        })
+            "entity_type": "item_total"
+        }
+        text_blocks.append(total_price_block)
         block_id += 1
         
-        # Add relations
-        relation_id = 1
-        
-        # Item name to quantity relation
-        relations.append({
-            "id": relation_id,
-            "source_id": item_name_id,
-            "target_id": quantity_id,
-            "relation_type": "item_quantity"
-        })
-        relation_id += 1
-        
-        # Item name to price relation
-        relations.append({
-            "id": relation_id,
-            "source_id": item_name_id,
-            "target_id": price_id,
-            "relation_type": "item_price"
-        })
-        relation_id += 1
-        
-        # Item name to total relation
-        relations.append({
-            "id": relation_id,
-            "source_id": item_name_id,
-            "target_id": total_id,
-            "relation_type": "item_total"
-        })
-        relation_id += 1
+        y_position += 60
     
-    # Add subtotal
+    y_position += 40
+    
+    # Summary
+    summary_x = col_positions[2]
+    
+    # Subtotal label
     text_blocks.append({
         "id": block_id,
-        "text": f"${image_data['subtotal']:.2f}",
-        "position": image_data["positions"]["subtotal"],
+        "text": "Subtotal:",
+        "position": {
+            "x_min": summary_x,
+            "y_min": y_position,
+            "x_max": summary_x + 200,
+            "y_max": y_position + 40
+        },
+        "entity_type": "label"
+    })
+    block_id += 1
+    
+    # Subtotal value
+    text_blocks.append({
+        "id": block_id,
+        "text": f"${invoice_data['subtotal']:.2f}",
+        "position": {
+            "x_min": col_positions[3],
+            "y_min": y_position,
+            "x_max": col_positions[3] + col_widths[3],
+            "y_max": y_position + 40
+        },
         "entity_type": "subtotal"
     })
     block_id += 1
+    y_position += 50
     
-    # Add tax
+    # Tax label
+    tax_label = f"Tax ({invoice_data['tax_rate']*100:.0f}%):"
     text_blocks.append({
         "id": block_id,
-        "text": f"${image_data['tax']:.2f}",
-        "position": image_data["positions"]["tax"],
-        "entity_type": "item_price"
+        "text": tax_label,
+        "position": {
+            "x_min": summary_x,
+            "y_min": y_position,
+            "x_max": summary_x + 200,
+            "y_max": y_position + 40
+        },
+        "entity_type": "label"
     })
     block_id += 1
     
-    # Add total
+    # Tax value
     text_blocks.append({
         "id": block_id,
-        "text": f"${image_data['total']:.2f}",
-        "position": image_data["positions"]["total"],
+        "text": f"${invoice_data['tax']:.2f}",
+        "position": {
+            "x_min": col_positions[3],
+            "y_min": y_position,
+            "x_max": col_positions[3] + col_widths[3],
+            "y_max": y_position + 40
+        },
+        "entity_type": "tax"
+    })
+    block_id += 1
+    y_position += 50
+    
+    # Total label
+    text_blocks.append({
+        "id": block_id,
+        "text": "Total:",
+        "position": {
+            "x_min": summary_x,
+            "y_min": y_position,
+            "x_max": summary_x + 200,
+            "y_max": y_position + 40
+        },
+        "entity_type": "label"
+    })
+    block_id += 1
+    
+    # Total value
+    text_blocks.append({
+        "id": block_id,
+        "text": f"${invoice_data['total']:.2f}",
+        "position": {
+            "x_min": col_positions[3],
+            "y_min": y_position,
+            "x_max": col_positions[3] + col_widths[3],
+            "y_max": y_position + 40
+        },
         "entity_type": "total"
     })
+    block_id += 1
     
-    # Create the annotation object
+    return text_blocks, item_blocks
+
+
+def create_relations(text_blocks, item_blocks):
+    """Create relations between text blocks"""
+    relations = []
+    relation_id = 0
+    
+    # Find item blocks
+    item_name_blocks = [block for block in text_blocks if block["entity_type"] == "item_name"]
+    
+    # Match item name blocks with quantity, price, and total blocks
+    for item_block in item_name_blocks:
+        item_y = (item_block["position"]["y_min"] + item_block["position"]["y_max"]) / 2
+        
+        # Find quantity, price, and total blocks for this item based on y position
+        for block in text_blocks:
+            block_y = (block["position"]["y_min"] + block["position"]["y_max"]) / 2
+            
+            # If blocks are in the same row (approximately)
+            if abs(block_y - item_y) < 30:
+                if block["entity_type"] == "item_quantity":
+                    relations.append({
+                        "id": relation_id,
+                        "source_id": item_block["id"],
+                        "target_id": block["id"],
+                        "relation_type": "item_quantity"
+                    })
+                    relation_id += 1
+                    
+                elif block["entity_type"] == "item_price":
+                    relations.append({
+                        "id": relation_id,
+                        "source_id": item_block["id"],
+                        "target_id": block["id"],
+                        "relation_type": "item_price"
+                    })
+                    relation_id += 1
+                    
+                elif block["entity_type"] == "item_total":
+                    relations.append({
+                        "id": relation_id,
+                        "source_id": item_block["id"],
+                        "target_id": block["id"],
+                        "relation_type": "item_total"
+                    })
+                    relation_id += 1
+    
+    return relations
+
+
+def create_annotation(image_path, invoice_data, text_blocks, relations):
+    """Create annotation JSON file"""
     annotation = {
-        "image_path": relative_image_path,
-        "width": IMAGE_WIDTH,
-        "height": IMAGE_HEIGHT,
+        "image_path": image_path,
+        "width": CANVAS_WIDTH,
+        "height": CANVAS_HEIGHT,
         "text_blocks": text_blocks,
-        "relations": relations
+        "relations": relations,
+        "metadata": {
+            "company_name": invoice_data["company_name"],
+            "invoice_number": invoice_data["invoice_number"],
+            "invoice_date": invoice_data["invoice_date"],
+            "customer_name": invoice_data["customer_name"],
+            "items": invoice_data["items"],
+            "subtotal": invoice_data["subtotal"],
+            "tax": invoice_data["tax"],
+            "tax_rate": invoice_data["tax_rate"],
+            "total": invoice_data["total"]
+        }
     }
     
-    # Write to file
-    with open(output_path, "w") as f:
+    return annotation
+
+
+def create_sample_invoice(output_dir, split):
+    """Create a sample invoice with image and annotation"""
+    # Create random invoice data
+    invoice_data = {
+        "company_name": random.choice(COMPANY_NAMES),
+        "invoice_number": generate_invoice_number(),
+        "invoice_date": generate_date(),
+        "customer_name": random.choice(CUSTOMER_NAMES),
+        "items": generate_items()
+    }
+    
+    # Calculate totals
+    invoice_data["subtotal"], invoice_data["tax"], invoice_data["total"] = calculate_totals(invoice_data["items"])
+    invoice_data["tax_rate"] = invoice_data["tax"] / invoice_data["subtotal"] if invoice_data["subtotal"] > 0 else 0.1
+    
+    # Create directories if they don't exist
+    images_dir = os.path.join(output_dir, "images", split)
+    annotations_dir = os.path.join(output_dir, "annotations", split)
+    
+    os.makedirs(images_dir, exist_ok=True)
+    os.makedirs(annotations_dir, exist_ok=True)
+    
+    # Generate unique ID
+    invoice_id = str(uuid.uuid4())[:8]
+    
+    # Create image
+    image_filename = f"invoice_{invoice_id}.png"
+    image_path = os.path.join(images_dir, image_filename)
+    relative_image_path = os.path.join("images", split, image_filename)
+    
+    canvas = create_invoice_image(invoice_data, image_path)
+    
+    # Extract text blocks and create relations
+    text_blocks, item_blocks = extract_text_blocks(canvas, invoice_data)
+    relations = create_relations(text_blocks, item_blocks)
+    
+    # Create annotation
+    annotation = create_annotation(relative_image_path, invoice_data, text_blocks, relations)
+    
+    # Save annotation
+    annotation_path = os.path.join(annotations_dir, f"invoice_{invoice_id}.json")
+    with open(annotation_path, "w") as f:
         json.dump(annotation, f, indent=2)
+    
+    print(f"Created annotation: {annotation_path}")
+    
+    return invoice_id
 
-def generate_random_invoice_data():
-    """Generate random invoice data"""
-    # Generate invoice number
-    invoice_number = f"INV-{random.randint(1000, 9999)}"
-    
-    # Generate invoice date
-    days_ago = random.randint(0, 60)
-    invoice_date = (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
-    
-    # Select customer
-    customer_name = random.choice(CUSTOMER_NAMES)
-    
-    # Generate items
-    num_items = random.randint(1, 5)
-    items = []
-    
-    for _ in range(num_items):
-        product = random.choice(PRODUCTS)
-        quantity = random.randint(1, 5)
-        
-        items.append({
-            "name": product["name"],
-            "quantity": quantity,
-            "price": product["price"]
-        })
-    
-    return invoice_number, invoice_date, customer_name, items
 
-def create_sample_datasets():
-    """Create sample datasets for training, validation, and testing"""
+def create_dataset(output_dir, num_train=20, num_val=5, num_test=5):
+    """Create a full dataset with train, val, and test splits"""
+    # Create base directories
+    os.makedirs(output_dir, exist_ok=True)
     
-    # Create training samples
-    for i in range(NUM_TRAIN_SAMPLES):
-        invoice_number, invoice_date, customer_name, items = generate_random_invoice_data()
-        
-        image_path = os.path.join(OUTPUT_DIR, "images", "train", f"invoice_{i+1}.jpg")
-        annotation_path = os.path.join(OUTPUT_DIR, "annotations", "train", f"invoice_{i+1}.json")
-        relative_image_path = f"images/train/invoice_{i+1}.jpg"
-        
-        image_data = create_invoice_image(image_path, invoice_number, invoice_date, customer_name, items)
-        create_annotation_file(image_data, relative_image_path, annotation_path)
-        
-        print(f"Created training sample {i+1}/{NUM_TRAIN_SAMPLES}")
+    # Create samples for each split
+    print(f"Creating {num_train} training samples...")
+    train_ids = [create_sample_invoice(output_dir, "train") for _ in range(num_train)]
     
-    # Create validation samples
-    for i in range(NUM_VAL_SAMPLES):
-        invoice_number, invoice_date, customer_name, items = generate_random_invoice_data()
-        
-        image_path = os.path.join(OUTPUT_DIR, "images", "val", f"invoice_{i+1}.jpg")
-        annotation_path = os.path.join(OUTPUT_DIR, "annotations", "val", f"invoice_{i+1}.json")
-        relative_image_path = f"images/val/invoice_{i+1}.jpg"
-        
-        image_data = create_invoice_image(image_path, invoice_number, invoice_date, customer_name, items)
-        create_annotation_file(image_data, relative_image_path, annotation_path)
-        
-        print(f"Created validation sample {i+1}/{NUM_VAL_SAMPLES}")
+    print(f"Creating {num_val} validation samples...")
+    val_ids = [create_sample_invoice(output_dir, "val") for _ in range(num_val)]
     
-    # Create test samples
-    for i in range(NUM_TEST_SAMPLES):
-        invoice_number, invoice_date, customer_name, items = generate_random_invoice_data()
-        
-        image_path = os.path.join(OUTPUT_DIR, "images", "test", f"invoice_{i+1}.jpg")
-        annotation_path = os.path.join(OUTPUT_DIR, "annotations", "test", f"invoice_{i+1}.json")
-        relative_image_path = f"images/test/invoice_{i+1}.jpg"
-        
-        image_data = create_invoice_image(image_path, invoice_number, invoice_date, customer_name, items)
-        create_annotation_file(image_data, relative_image_path, annotation_path)
-        
-        print(f"Created test sample {i+1}/{NUM_TEST_SAMPLES}")
+    print(f"Creating {num_test} test samples...")
+    test_ids = [create_sample_invoice(output_dir, "test") for _ in range(num_test)]
+    
+    # Create dataset metadata
+    metadata = {
+        "dataset_name": "Invoice Extraction Sample Dataset",
+        "created_at": datetime.now().isoformat(),
+        "num_train": num_train,
+        "num_val": num_val,
+        "num_test": num_test,
+        "train_ids": train_ids,
+        "val_ids": val_ids,
+        "test_ids": test_ids,
+        "entity_types": [
+            "invoice_number",
+            "invoice_date",
+            "customer_name",
+            "item_name",
+            "item_quantity",
+            "item_price",
+            "subtotal",
+            "total",
+            "tax",
+            "company_name",
+            "label",
+            "table_header"
+        ],
+        "relation_types": [
+            "item_quantity",
+            "item_price",
+            "item_total"
+        ]
+    }
+    
+    # Save metadata
+    metadata_path = os.path.join(output_dir, "metadata.json")
+    with open(metadata_path, "w") as f:
+        json.dump(metadata, f, indent=2)
+    
+    print(f"Dataset created at {output_dir}")
+    print(f"Total samples: {num_train + num_val + num_test}")
+    print(f"Metadata saved to {metadata_path}")
+
 
 if __name__ == "__main__":
-    print("Creating sample datasets for invoice extraction...")
-    create_sample_datasets()
-    print(f"Done! Created {NUM_TRAIN_SAMPLES} training samples, {NUM_VAL_SAMPLES} validation samples, and {NUM_TEST_SAMPLES} test samples.")
-    print(f"Dataset is located at: {os.path.abspath(OUTPUT_DIR)}")
+    parser = argparse.ArgumentParser(description="Create a sample dataset for invoice extraction")
+    parser.add_argument(
+        "--output_dir", type=str, default="dataset",
+        help="Directory to store the dataset"
+    )
+    parser.add_argument(
+        "--train", type=int, default=20,
+        help="Number of training samples"
+    )
+    parser.add_argument(
+        "--val", type=int, default=5,
+        help="Number of validation samples"
+    )
+    parser.add_argument(
+        "--test", type=int, default=5,
+        help="Number of test samples"
+    )
+    
+    args = parser.parse_args()
+    
+    create_dataset(args.output_dir, args.train, args.val, args.test)
