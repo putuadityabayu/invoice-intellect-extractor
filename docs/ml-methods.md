@@ -1,202 +1,89 @@
 
 # Machine Learning Methods for Invoice Information Extraction
 
-This document explains the key machine learning methods used in our invoice extraction system.
+This document outlines the machine learning techniques used in the invoice information extraction system.
 
-## 1. Neural Network Architectures
+## Architectures
 
-### Entity Classifier Model
-We use a simple feedforward neural network with the following architecture:
-- Input layer (768 dimensions) - Takes text features from transformer embeddings
-- Hidden layer 1 (256 neurons) with ReLU activation and dropout (0.3)
-- Hidden layer 2 (128 neurons) with ReLU activation and dropout (0.3)
-- Output layer (8 neurons) - One for each entity type
-  - invoice_number
-  - invoice_date
-  - customer_name
-  - item_name
-  - item_quantity
-  - item_price
-  - subtotal
-  - total
+### 1. LayoutLM-inspired Model with Transformer Architecture
 
-### Relation Extractor Model
-Similar architecture but designed for identifying relationships between text elements:
-- Input layer (768*2 dimensions) - Takes concatenated features from two text elements
-- Hidden layer 1 (256 neurons) with ReLU activation and dropout (0.3)
-- Hidden layer 2 (128 neurons) with ReLU activation and dropout (0.3)
-- Output layer (4 neurons) - One for each relation type
-  - none
-  - item_quantity
-  - item_price
-  - item_total
+Our system uses a LayoutLM-inspired model with transformer architecture to effectively process both textual and spatial information:
 
-### LayoutLM-inspired Model
-A model inspired by LayoutLM that combines text and spatial features:
-- Separate encoding branches for text and spatial features
-  - Text encoder: Linear(768) → ReLU → Linear(256)
-  - Spatial encoder: Linear(4) → ReLU → Linear(64)
-- Combined features processing
-  - Concatenate text and spatial features
-  - Hidden layer 1 (256 neurons) with ReLU activation and dropout (0.3)
-  - Hidden layer 2 (128 neurons) with ReLU activation and dropout (0.3)
-  - Output layer (8 neurons) - Same entity types as the first model
+- **Transformer Blocks**: Multi-head self-attention mechanisms allow the model to focus on different parts of the document and establish relationships between text blocks based on their content and position.
+  
+- **Positional Encoding**: Custom positional encoding is added to input embeddings to help the model understand the relative positions of text blocks.
 
-## 2. Named Entity Recognition with spaCy
+- **Bidirectional LSTM Layers**: Added on top of the transformer outputs to better capture sequential dependencies and improve the model's understanding of document flow.
 
-### Custom spaCy NER Model
-We train a custom Named Entity Recognition model using spaCy to identify entity types directly from text:
-- Uses spaCy's entity recognition capabilities
-- Custom entity types for invoice elements:
-  - INVOICE_NUMBER
-  - DATE
-  - CUSTOMER
-  - ITEM
-  - QUANTITY
-  - PRICE
-  - SUBTOTAL
-  - TOTAL
-- Training process:
-  - Convert annotated text blocks to spaCy training format
-  - Train using spaCy's built-in training API
-  - Apply transfer learning from base English model
+- **Spatial Features**: We encode the bounding box coordinates (normalized x_min, y_min, x_max, y_max) to capture the spatial layout of text elements.
 
-### NER Integration
-- The spaCy NER model provides an alternative prediction method
-- Results are combined with neural network predictions for improved accuracy
-- Especially effective for text with specific formats (dates, invoice numbers)
+### 2. Relation Extraction with BiLSTM and Attention
 
-## 3. Feature Extraction Methods
+Our relation extraction model uses:
 
-### Text Embedding
-- Uses DistilBERT model for generating text embeddings
-- Each text block is tokenized and converted to 768-dimensional vectors
-- CLS token embedding is used as the text representation
-- This captures semantic meaning of text for classification
+- **Bidirectional LSTM**: Processes pairs of text blocks to understand their relationships and dependencies.
+  
+- **Attention Mechanism**: Helps focus on the most relevant parts of the sequence for relation prediction.
+  
+- **Layer Normalization**: Improves training stability and model performance.
 
-### Positional Features
-- Incorporates spatial information from OCR output
-- Uses normalized coordinates (x_min, y_min, x_max, y_max)
-- Helps in understanding document layout and relationships
+## Feature Extraction
 
-### Layout Analysis
-- Identifies rows and columns in the document
-- Groups text blocks into logical structures (headers, items, totals)
-- Detects table structures for extracting item information
-- Enhances extraction by understanding the document structure
+### Text Features
 
-## 4. Ensemble Approach
+- **Text Embeddings**: Character-level and keyword features provide a basic representation of text content. In a production system, these would be replaced with pre-trained language model embeddings (e.g., BERT, RoBERTa).
 
-Our system combines multiple extraction methods:
-1. **Neural network classification** - Primary entity type prediction
-2. **spaCy NER** - Text-based entity recognition
-3. **Layout-aware extraction** - Using spatial information
-4. **Rule-based extraction** - Fallback for specific patterns
+- **Text Length**: Normalized text length as a feature.
 
-Results from these methods are combined using a weighted approach that prioritizes:
-- Layout-based extraction for structured elements (tables)
-- NER for named entities and dates
-- Neural network for classification confidence
-- Rule-based extraction as fallback
+- **Keyword Indicators**: Binary features indicating presence of domain-specific terms like "invoice", "total", etc.
 
-## 5. Training Approach
+### Spatial Features
 
-### Entity Classification
-1. **Data Preparation**
-   - Text blocks labeled with entity types
-   - Augmentation with different fonts, sizes, and rotations
-   - Balance dataset across all entity types
+- **Normalized Coordinates**: Bounding box coordinates (x_min, y_min, x_max, y_max) normalized to page dimensions.
 
-2. **Training Process**
-   - Cross-entropy loss function
-   - Adam optimizer with learning rate 0.001
-   - Batch size of 32
-   - Early stopping based on validation loss
+- **Relative Positioning**: For relation extraction, we compute distances and relative positions between text block pairs.
 
-### Relation Extraction
-1. **Data Preparation**
-   - Pairs of text blocks labeled with relation types
-   - Negative sampling for "none" relations
-   - Consideration of spatial proximity
+## Training Process
 
-2. **Training Process**
-   - Cross-entropy loss function
-   - Adam optimizer with learning rate 0.001
-   - Batch size of 32
-   - Early stopping based on validation loss
+The system supports training on annotated invoice data:
 
-### Layout Model
-1. **Data Preparation**
-   - Text blocks with position information
-   - Text features combined with spatial features
-   - Normalization of spatial coordinates
+1. **Supervised Learning**: Models are trained using supervised learning with labeled invoice datasets.
+2. **Loss Function**: Cross-entropy loss for classification tasks.
+3. **Optimization**: Adam optimizer with learning rate scheduling.
+4. **Validation**: Models are evaluated on validation sets to prevent overfitting.
+5. **Bidirectional Learning**: The BiLSTM layers enable the model to learn context in both forward and backward directions.
 
-2. **Training Process**
-   - Cross-entropy loss function
-   - Adam optimizer with learning rate 0.001
-   - Batch size of 32
-   - Early stopping based on validation loss
+## Self-Learning Capabilities
 
-### spaCy NER
-1. **Data Preparation**
-   - Conversion of annotated text blocks to spaCy format
-   - Creation of document spans with entity annotations
-   - Generation of training and validation sets
+While not fully "unsupervised", the system has some self-learning capabilities:
 
-2. **Training Process**
-   - Transfer learning from base English model
-   - Batch size of 8
-   - Dropout rate of 0.2
-   - Early stopping with patience of 5
-   - Maximum of 20 epochs
+1. **Attention Mechanisms**: Allow the model to learn which parts of the document are important for different tasks.
 
-## 6. Rule-Based Fallback
+2. **Transformer Architecture**: Enables the model to establish relationships between document elements without explicit rules.
 
-When model confidence is low or in absence of trained models:
-- Regular expressions for date and number formats
-- Keyword matching for entity types
-- Spatial relationship analysis
-- Position-based table structure detection
-- Format validation for specific entity types
+3. **Transfer Learning Potential**: The architecture supports fine-tuning from pre-trained models, allowing knowledge transfer from general document understanding tasks.
 
-## 7. Post-processing Methods
+4. **Context Understanding**: BiLSTM layers help the model understand contextual relationships between different parts of the document.
 
-1. **Confidence Thresholding**
-   - Only accept predictions above confidence threshold
-   - Fall back to rule-based for low confidence
+## Entity Classification
 
-2. **Consistency Checks**
-   - Validate numerical relationships (e.g., quantity * unit_price = total_price)
-   - Date format validation
-   - Invoice number format validation
+Entities are classified using a combination of:
 
-3. **Result Combination**
-   - Merge results from different extraction methods
-   - Resolve conflicts based on confidence scores
-   - Ensure consistency in numerical values
+- **LayoutLM-based Classification**: Using both text content and spatial position to identify entity types.
+- **Named Entity Recognition (NER)**: Using spaCy for entity recognition, especially for named entities like people, organizations, dates.
 
-## 8. Future Improvements
+## Multi-language Support
 
-1. **Model Architecture**
-   - Implement full LayoutLM or LayoutLMv2 with transformer architecture
-   - Add bidirectional LSTM layers for sequence understanding
-   - Incorporate attention mechanisms to focus on relevant text parts
-   - Graph neural networks for better relation extraction
+The architecture is designed to support multiple languages:
 
-2. **Training Data**
-   - Increase dataset diversity with more invoice formats
-   - More augmentation techniques for robustness
-   - Active learning for hard examples
-   - Few-shot learning for rare entity types
+- The character-level features allow basic processing of different scripts.
+- Spatial features are language-agnostic.
+- The architecture can be extended with multilingual embeddings for improved performance.
 
-3. **Feature Engineering**
-   - Include font properties (size, style, weight)
-   - Add more contextual features from surrounding text
-   - Improved table structure detection
-   - Document section classification
+## Future Improvements
 
-4. **Integration with LLMs**
-   - Use large language models for text understanding
-   - Zero-shot learning for unseen invoice formats
-   - Prompt engineering for specific extraction tasks
-   - Multimodal models that combine vision and language
+1. **Pre-trained Embeddings**: Replace simple text features with pre-trained multilingual embeddings.
+2. **Graph Neural Networks**: Add GNN components to better capture document structure.
+3. **Self-supervised Pre-training**: Implement pre-training on unlabeled invoice data.
+4. **Active Learning**: Implement a feedback loop where uncertain predictions are flagged for human review.
+5. **Domain Adaptation**: Add components for adapting to different invoice layouts and templates.
