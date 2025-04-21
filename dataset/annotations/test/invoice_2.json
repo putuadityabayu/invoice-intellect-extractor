@@ -1,0 +1,261 @@
+{
+  "image_path": "images/test/invoice_2.jpg",
+  "width": 1000,
+  "height": 1400,
+  "text_blocks": [
+    {
+      "id": 1,
+      "text": "Invoice #: INV-1982",
+      "position": {
+        "x_min": 100,
+        "y_min": 160,
+        "x_max": 300,
+        "y_max": 185
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 2,
+      "text": "Date: 2025-03-05",
+      "position": {
+        "x_min": 100,
+        "y_min": 190,
+        "x_max": 300,
+        "y_max": 215
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 3,
+      "text": "Sarah Williams",
+      "position": {
+        "x_min": 100,
+        "y_min": 270,
+        "x_max": 400,
+        "y_max": 295
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 4,
+      "text": "Mouse",
+      "position": {
+        "x_min": 100,
+        "y_min": 400,
+        "x_max": 400,
+        "y_max": 425
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 5,
+      "text": "4",
+      "position": {
+        "x_min": 500,
+        "y_min": 400,
+        "x_max": 550,
+        "y_max": 425
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 6,
+      "text": "$29.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 400,
+        "x_max": 670,
+        "y_max": 425
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 7,
+      "text": "$119.96",
+      "position": {
+        "x_min": 750,
+        "y_min": 400,
+        "x_max": 850,
+        "y_max": 425
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 8,
+      "text": "Tablet",
+      "position": {
+        "x_min": 100,
+        "y_min": 440,
+        "x_max": 400,
+        "y_max": 465
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 9,
+      "text": "4",
+      "position": {
+        "x_min": 500,
+        "y_min": 440,
+        "x_max": 550,
+        "y_max": 465
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 10,
+      "text": "$349.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 440,
+        "x_max": 670,
+        "y_max": 465
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 11,
+      "text": "$1399.96",
+      "position": {
+        "x_min": 750,
+        "y_min": 440,
+        "x_max": 850,
+        "y_max": 465
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 12,
+      "text": "Tablet",
+      "position": {
+        "x_min": 100,
+        "y_min": 480,
+        "x_max": 400,
+        "y_max": 505
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 13,
+      "text": "3",
+      "position": {
+        "x_min": 500,
+        "y_min": 480,
+        "x_max": 550,
+        "y_max": 505
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 14,
+      "text": "$349.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 480,
+        "x_max": 670,
+        "y_max": 505
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 15,
+      "text": "$1049.97",
+      "position": {
+        "x_min": 750,
+        "y_min": 480,
+        "x_max": 850,
+        "y_max": 505
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 16,
+      "text": "$2569.89",
+      "position": {
+        "x_min": 750,
+        "y_min": 560,
+        "x_max": 850,
+        "y_max": 585
+      },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 17,
+      "text": "$256.99",
+      "position": {
+        "x_min": 750,
+        "y_min": 590,
+        "x_max": 850,
+        "y_max": 615
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 18,
+      "text": "$2826.88",
+      "position": {
+        "x_min": 750,
+        "y_min": 630,
+        "x_max": 850,
+        "y_max": 655
+      },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 1,
+      "source_id": 4,
+      "target_id": 5,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 4,
+      "target_id": 6,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 4,
+      "target_id": 7,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 8,
+      "target_id": 9,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 8,
+      "target_id": 10,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 8,
+      "target_id": 11,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 12,
+      "target_id": 13,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 12,
+      "target_id": 14,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 12,
+      "target_id": 15,
+      "relation_type": "item_total"
+    }
+  ]
+}

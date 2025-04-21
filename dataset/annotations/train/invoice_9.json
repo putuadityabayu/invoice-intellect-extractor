@@ -1,0 +1,137 @@
+{
+  "image_path": "images/train/invoice_9.jpg",
+  "width": 1000,
+  "height": 1400,
+  "text_blocks": [
+    {
+      "id": 1,
+      "text": "Invoice #: INV-3111",
+      "position": {
+        "x_min": 100,
+        "y_min": 160,
+        "x_max": 300,
+        "y_max": 185
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 2,
+      "text": "Date: 2025-04-13",
+      "position": {
+        "x_min": 100,
+        "y_min": 190,
+        "x_max": 300,
+        "y_max": 215
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 3,
+      "text": "Robert Johnson",
+      "position": {
+        "x_min": 100,
+        "y_min": 270,
+        "x_max": 400,
+        "y_max": 295
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 4,
+      "text": "Printer",
+      "position": {
+        "x_min": 100,
+        "y_min": 400,
+        "x_max": 400,
+        "y_max": 425
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 5,
+      "text": "3",
+      "position": {
+        "x_min": 500,
+        "y_min": 400,
+        "x_max": 550,
+        "y_max": 425
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 6,
+      "text": "$199.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 400,
+        "x_max": 670,
+        "y_max": 425
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 7,
+      "text": "$599.97",
+      "position": {
+        "x_min": 750,
+        "y_min": 400,
+        "x_max": 850,
+        "y_max": 425
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 8,
+      "text": "$599.97",
+      "position": {
+        "x_min": 750,
+        "y_min": 480,
+        "x_max": 850,
+        "y_max": 505
+      },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 9,
+      "text": "$60.00",
+      "position": {
+        "x_min": 750,
+        "y_min": 510,
+        "x_max": 850,
+        "y_max": 535
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 10,
+      "text": "$659.97",
+      "position": {
+        "x_min": 750,
+        "y_min": 550,
+        "x_max": 850,
+        "y_max": 575
+      },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 1,
+      "source_id": 4,
+      "target_id": 5,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 4,
+      "target_id": 6,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 4,
+      "target_id": 7,
+      "relation_type": "item_total"
+    }
+  ]
+}

@@ -1,0 +1,385 @@
+{
+  "image_path": "images/train/invoice_10.jpg",
+  "width": 1000,
+  "height": 1400,
+  "text_blocks": [
+    {
+      "id": 1,
+      "text": "Invoice #: INV-3506",
+      "position": {
+        "x_min": 100,
+        "y_min": 160,
+        "x_max": 300,
+        "y_max": 185
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 2,
+      "text": "Date: 2025-03-26",
+      "position": {
+        "x_min": 100,
+        "y_min": 190,
+        "x_max": 300,
+        "y_max": 215
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 3,
+      "text": "John Doe",
+      "position": {
+        "x_min": 100,
+        "y_min": 270,
+        "x_max": 400,
+        "y_max": 295
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 4,
+      "text": "Tablet",
+      "position": {
+        "x_min": 100,
+        "y_min": 400,
+        "x_max": 400,
+        "y_max": 425
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 5,
+      "text": "2",
+      "position": {
+        "x_min": 500,
+        "y_min": 400,
+        "x_max": 550,
+        "y_max": 425
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 6,
+      "text": "$349.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 400,
+        "x_max": 670,
+        "y_max": 425
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 7,
+      "text": "$699.98",
+      "position": {
+        "x_min": 750,
+        "y_min": 400,
+        "x_max": 850,
+        "y_max": 425
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 8,
+      "text": "Smartphone",
+      "position": {
+        "x_min": 100,
+        "y_min": 440,
+        "x_max": 400,
+        "y_max": 465
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 9,
+      "text": "4",
+      "position": {
+        "x_min": 500,
+        "y_min": 440,
+        "x_max": 550,
+        "y_max": 465
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 10,
+      "text": "$799.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 440,
+        "x_max": 670,
+        "y_max": 465
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 11,
+      "text": "$3199.96",
+      "position": {
+        "x_min": 750,
+        "y_min": 440,
+        "x_max": 850,
+        "y_max": 465
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 12,
+      "text": "Tablet",
+      "position": {
+        "x_min": 100,
+        "y_min": 480,
+        "x_max": 400,
+        "y_max": 505
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 13,
+      "text": "4",
+      "position": {
+        "x_min": 500,
+        "y_min": 480,
+        "x_max": 550,
+        "y_max": 505
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 14,
+      "text": "$349.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 480,
+        "x_max": 670,
+        "y_max": 505
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 15,
+      "text": "$1399.96",
+      "position": {
+        "x_min": 750,
+        "y_min": 480,
+        "x_max": 850,
+        "y_max": 505
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 16,
+      "text": "Laptop",
+      "position": {
+        "x_min": 100,
+        "y_min": 520,
+        "x_max": 400,
+        "y_max": 545
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 17,
+      "text": "2",
+      "position": {
+        "x_min": 500,
+        "y_min": 520,
+        "x_max": 550,
+        "y_max": 545
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 18,
+      "text": "$1299.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 520,
+        "x_max": 670,
+        "y_max": 545
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 19,
+      "text": "$2599.98",
+      "position": {
+        "x_min": 750,
+        "y_min": 520,
+        "x_max": 850,
+        "y_max": 545
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 20,
+      "text": "Headphones",
+      "position": {
+        "x_min": 100,
+        "y_min": 560,
+        "x_max": 400,
+        "y_max": 585
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 21,
+      "text": "2",
+      "position": {
+        "x_min": 500,
+        "y_min": 560,
+        "x_max": 550,
+        "y_max": 585
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 22,
+      "text": "$129.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 560,
+        "x_max": 670,
+        "y_max": 585
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 23,
+      "text": "$259.98",
+      "position": {
+        "x_min": 750,
+        "y_min": 560,
+        "x_max": 850,
+        "y_max": 585
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 24,
+      "text": "$8159.86",
+      "position": {
+        "x_min": 750,
+        "y_min": 640,
+        "x_max": 850,
+        "y_max": 665
+      },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 25,
+      "text": "$815.99",
+      "position": {
+        "x_min": 750,
+        "y_min": 670,
+        "x_max": 850,
+        "y_max": 695
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 26,
+      "text": "$8975.85",
+      "position": {
+        "x_min": 750,
+        "y_min": 710,
+        "x_max": 850,
+        "y_max": 735
+      },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 1,
+      "source_id": 4,
+      "target_id": 5,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 4,
+      "target_id": 6,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 4,
+      "target_id": 7,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 8,
+      "target_id": 9,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 8,
+      "target_id": 10,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 8,
+      "target_id": 11,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 12,
+      "target_id": 13,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 12,
+      "target_id": 14,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 12,
+      "target_id": 15,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 16,
+      "target_id": 17,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 16,
+      "target_id": 18,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 16,
+      "target_id": 19,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 20,
+      "target_id": 21,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 20,
+      "target_id": 22,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 20,
+      "target_id": 23,
+      "relation_type": "item_total"
+    }
+  ]
+}

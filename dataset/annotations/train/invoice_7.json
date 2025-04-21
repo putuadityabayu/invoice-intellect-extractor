@@ -1,0 +1,323 @@
+{
+  "image_path": "images/train/invoice_7.jpg",
+  "width": 1000,
+  "height": 1400,
+  "text_blocks": [
+    {
+      "id": 1,
+      "text": "Invoice #: INV-1291",
+      "position": {
+        "x_min": 100,
+        "y_min": 160,
+        "x_max": 300,
+        "y_max": 185
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 2,
+      "text": "Date: 2025-04-07",
+      "position": {
+        "x_min": 100,
+        "y_min": 190,
+        "x_max": 300,
+        "y_max": 215
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 3,
+      "text": "Michael Brown",
+      "position": {
+        "x_min": 100,
+        "y_min": 270,
+        "x_max": 400,
+        "y_max": 295
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 4,
+      "text": "Smartphone",
+      "position": {
+        "x_min": 100,
+        "y_min": 400,
+        "x_max": 400,
+        "y_max": 425
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 5,
+      "text": "5",
+      "position": {
+        "x_min": 500,
+        "y_min": 400,
+        "x_max": 550,
+        "y_max": 425
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 6,
+      "text": "$799.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 400,
+        "x_max": 670,
+        "y_max": 425
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 7,
+      "text": "$3999.95",
+      "position": {
+        "x_min": 750,
+        "y_min": 400,
+        "x_max": 850,
+        "y_max": 425
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 8,
+      "text": "Smartphone",
+      "position": {
+        "x_min": 100,
+        "y_min": 440,
+        "x_max": 400,
+        "y_max": 465
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 9,
+      "text": "2",
+      "position": {
+        "x_min": 500,
+        "y_min": 440,
+        "x_max": 550,
+        "y_max": 465
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 10,
+      "text": "$799.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 440,
+        "x_max": 670,
+        "y_max": 465
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 11,
+      "text": "$1599.98",
+      "position": {
+        "x_min": 750,
+        "y_min": 440,
+        "x_max": 850,
+        "y_max": 465
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 12,
+      "text": "Laptop",
+      "position": {
+        "x_min": 100,
+        "y_min": 480,
+        "x_max": 400,
+        "y_max": 505
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 13,
+      "text": "4",
+      "position": {
+        "x_min": 500,
+        "y_min": 480,
+        "x_max": 550,
+        "y_max": 505
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 14,
+      "text": "$1299.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 480,
+        "x_max": 670,
+        "y_max": 505
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 15,
+      "text": "$5199.96",
+      "position": {
+        "x_min": 750,
+        "y_min": 480,
+        "x_max": 850,
+        "y_max": 505
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 16,
+      "text": "Printer",
+      "position": {
+        "x_min": 100,
+        "y_min": 520,
+        "x_max": 400,
+        "y_max": 545
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 17,
+      "text": "3",
+      "position": {
+        "x_min": 500,
+        "y_min": 520,
+        "x_max": 550,
+        "y_max": 545
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 18,
+      "text": "$199.99",
+      "position": {
+        "x_min": 600,
+        "y_min": 520,
+        "x_max": 670,
+        "y_max": 545
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 19,
+      "text": "$599.97",
+      "position": {
+        "x_min": 750,
+        "y_min": 520,
+        "x_max": 850,
+        "y_max": 545
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 20,
+      "text": "$11399.86",
+      "position": {
+        "x_min": 750,
+        "y_min": 600,
+        "x_max": 850,
+        "y_max": 625
+      },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 21,
+      "text": "$1139.99",
+      "position": {
+        "x_min": 750,
+        "y_min": 630,
+        "x_max": 850,
+        "y_max": 655
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 22,
+      "text": "$12539.85",
+      "position": {
+        "x_min": 750,
+        "y_min": 670,
+        "x_max": 850,
+        "y_max": 695
+      },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 1,
+      "source_id": 4,
+      "target_id": 5,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 4,
+      "target_id": 6,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 4,
+      "target_id": 7,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 8,
+      "target_id": 9,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 8,
+      "target_id": 10,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 8,
+      "target_id": 11,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 12,
+      "target_id": 13,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 12,
+      "target_id": 14,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 12,
+      "target_id": 15,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 1,
+      "source_id": 16,
+      "target_id": 17,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 2,
+      "source_id": 16,
+      "target_id": 18,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 3,
+      "source_id": 16,
+      "target_id": 19,
+      "relation_type": "item_total"
+    }
+  ]
+}

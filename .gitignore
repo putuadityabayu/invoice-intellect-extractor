@@ -23,6 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-dataset/
+#dataset/
 models/
 temp_uploads/
