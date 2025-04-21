@@ -8,7 +8,10 @@ An AI-powered application for extracting structured data from invoice images usi
 - Flask API for accepting invoice images (upload or URL)
 - Custom OCR processing with doctr for text extraction
 - Image preprocessing for enhanced quality and OCR accuracy
-- Custom machine learning models for entity classification
+- Multiple ML approaches for entity classification:
+  - Neural network entity classification
+  - Named Entity Recognition (NER) with spaCy
+  - LayoutLM-inspired spatial-aware document understanding
 - Relation extraction for identifying invoice items and pricing
 - React frontend for uploading invoices and viewing extracted data
 - Structured JSON output with key invoice information
@@ -19,6 +22,9 @@ An AI-powered application for extracting structured data from invoice images usi
 
 - Docker and Docker Compose
 - Git
+- Python 3.8+
+- PyTorch
+- spaCy
 
 ### Development with DevContainer
 
@@ -77,6 +83,54 @@ Options explained:
 - `--timeout 120`: Sets worker timeout to 120 seconds for processing large images
 - `--daemon`: Runs in the background
 
+### Production Deployment with Gunicorn and Nginx
+
+For production, it's recommended to use Gunicorn behind a reverse proxy like Nginx:
+
+1. Create a systemd service file at `/etc/systemd/system/invoice-extractor.service`:
+
+```
+[Unit]
+Description=Invoice Extractor Gunicorn Service
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/path/to/invoice-intellect-extractor
+ExecStart=/path/to/venv/bin/gunicorn app:app -w 4 -b 127.0.0.1:5000 --timeout 120
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+2. Configure Nginx as a reverse proxy:
+
+```
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        client_max_body_size 16M;
+    }
+}
+```
+
+3. Enable and start the service:
+
+```bash
+sudo systemctl enable invoice-extractor
+sudo systemctl start invoice-extractor
+sudo systemctl restart nginx
+```
+
 ## API Usage
 
 ### Extract Invoice Data
@@ -132,41 +186,50 @@ curl -X POST -F "image_url=https://example.com/invoice.jpg" http://localhost:500
 
 ## Model Training
 
-The system uses custom machine learning models for entity classification and relation extraction. These models need to be trained before use.
+The system uses multiple machine learning approaches for entity classification and relation extraction:
 
-### Dataset Preparation
+1. Neural network models for entity classification and relation extraction
+2. spaCy NER model for named entity recognition
+3. LayoutLM-inspired model for layout-aware document understanding
+
+### Creating a Training Dataset
+
+#### Using the Sample Dataset Generator
+
+The easiest way to start is by using the provided sample dataset generator:
+
+```bash
+# Generate a sample dataset with 20 training, 5 validation, and 5 test invoices
+python utils/create_sample_dataset.py --output_dir dataset --train 20 --val 5 --test 5
+```
+
+This will create a complete dataset with images and annotations in the proper format.
 
 #### Directory Structure
 
-Create a dataset directory with the following structure:
+If you want to create your own dataset, use the following directory structure:
 
 ```
 dataset/
 ├── images/             # Raw invoice images
 │   ├── train/          # Training set images
 │   │   ├── img1.jpg
-│   │   ├── img2.jpg
 │   │   └── ...
 │   ├── val/            # Validation set images
 │   │   ├── img101.jpg
-│   │   ├── img102.jpg
 │   │   └── ...
 │   └── test/           # Test set images
 │       ├── img201.jpg
-│       ├── img202.jpg
 │       └── ...
 └── annotations/        # Annotations for each image
     ├── train/
     │   ├── img1.json
-    │   ├── img2.json
     │   └── ...
     ├── val/
     │   ├── img101.json
-    │   ├── img102.json
     │   └── ...
     └── test/
         ├── img201.json
-        ├── img202.json
         └── ...
 ```
 
@@ -226,142 +289,12 @@ Where:
 - `entity_type` can be: "invoice_number", "invoice_date", "customer_name", "item_name", "item_quantity", "item_price", "subtotal", "total"
 - `relation_type` can be: "none", "item_quantity", "item_price", "item_total"
 
-### Sample Dataset for Testing
-
-Here's a simple example of how to create a small test dataset:
-
-1. Create the directory structure:
-```bash
-mkdir -p dataset/images/{train,val,test}
-mkdir -p dataset/annotations/{train,val,test}
-```
-
-2. Place invoice images in the appropriate folders (train, val, test).
-
-3. Create annotation files for each image following the format above.
-
-#### Example Annotation File (dataset/annotations/train/invoice1.json):
-
-```json
-{
-  "image_path": "images/train/invoice1.jpg",
-  "width": 1000,
-  "height": 1414,
-  "text_blocks": [
-    {
-      "id": 1,
-      "text": "INVOICE #INV-2023-001",
-      "position": {
-        "x_min": 100,
-        "y_min": 50,
-        "x_max": 300,
-        "y_max": 80
-      },
-      "entity_type": "invoice_number"
-    },
-    {
-      "id": 2,
-      "text": "Date: 2023-10-15",
-      "position": {
-        "x_min": 500,
-        "y_min": 50,
-        "x_max": 650,
-        "y_max": 80
-      },
-      "entity_type": "invoice_date"
-    },
-    {
-      "id": 3,
-      "text": "John Doe",
-      "position": {
-        "x_min": 100,
-        "y_min": 120,
-        "x_max": 250,
-        "y_max": 150
-      },
-      "entity_type": "customer_name"
-    },
-    {
-      "id": 4,
-      "text": "Product A",
-      "position": {
-        "x_min": 100,
-        "y_min": 200,
-        "x_max": 300,
-        "y_max": 230
-      },
-      "entity_type": "item_name"
-    },
-    {
-      "id": 5,
-      "text": "2",
-      "position": {
-        "x_min": 350,
-        "y_min": 200,
-        "x_max": 380,
-        "y_max": 230
-      },
-      "entity_type": "item_quantity"
-    },
-    {
-      "id": 6,
-      "text": "$10.99",
-      "position": {
-        "x_min": 400,
-        "y_min": 200,
-        "x_max": 450,
-        "y_max": 230
-      },
-      "entity_type": "item_price"
-    }
-  ],
-  "relations": [
-    {
-      "id": 1,
-      "source_id": 4,
-      "target_id": 5,
-      "relation_type": "item_quantity"
-    },
-    {
-      "id": 2,
-      "source_id": 4,
-      "target_id": 6,
-      "relation_type": "item_price"
-    }
-  ]
-}
-```
-
-### Creating a Training Dataset from Scratch
-
-For real-world applications, you would typically follow these steps:
-
-1. **Collect Invoice Images**: 
-   - Gather a diverse set of invoice images in different formats and layouts
-   - Include varying fields, vendors, and styles for robust training
-
-2. **Annotation Process**:
-   - Use annotation tools like LabelImg, CVAT, or custom annotation scripts
-   - For each image:
-     a) Identify text blocks using OCR
-     b) Manually label each text block with its entity type
-     c) Define relations between text blocks (e.g., which price belongs to which item)
-   - Save annotations in the specified JSON format
-
-3. **Dataset Splitting**:
-   - Split your dataset into training (70%), validation (15%), and test (15%) sets
-   - Ensure each set contains a diverse range of invoice types
-
-4. **Data Augmentation** (optional):
-   - Generate additional training samples by applying transformations
-   - Techniques include rotation, noise addition, contrast changes, etc.
-
 ### Training the Models
 
-Once your dataset is prepared, you can train the models using the training script:
+Once your dataset is prepared, you can train all the models using the training script:
 
 ```bash
-python train.py --data_dir=dataset --output_dir=models --epochs=20 --batch_size=32 --lr=0.001 --model=both
+python train.py --data_dir=dataset --output_dir=models --epochs=20 --batch_size=32 --lr=0.001 --model=all
 ```
 
 Options:
@@ -370,73 +303,46 @@ Options:
 - `--epochs`: Number of training epochs
 - `--batch_size`: Batch size for training
 - `--lr`: Learning rate
-- `--model`: Which model to train (entity, relation, or both)
+- `--model`: Which model to train:
+  - `entity`: Only train the entity classifier
+  - `relation`: Only train the relation extractor
+  - `layout`: Only train the layout-aware model
+  - `spacy`: Only prepare and train the spaCy NER model
+  - `all`: Train all models (default)
+
+### spaCy NER Training
+
+When training the spaCy NER model, the script will:
+1. Generate the necessary training data files
+2. Create a configuration file
+3. Generate a training script
+
+You may need to manually run the training script for the spaCy model:
+
+```bash
+cd models/spacy_ner
+bash train.sh
+```
+
+This will train the spaCy NER model using the generated training files.
 
 ### Using Trained Models
 
-After training, the models will be saved in the specified output directory. The pipeline will automatically use them as long as they're located in the "models" directory.
-
-## Deployment
-
-### Docker Deployment
-
-Build and run with Docker:
-
-```bash
-# Build the Docker image
-docker build -t invoice-extractor .
-
-# Run the container
-docker run -p 5000:5000 invoice-extractor
-```
-
-### Production Deployment with Gunicorn and Nginx
-
-For production, it's recommended to use Gunicorn behind a reverse proxy like Nginx:
-
-1. Create a systemd service file at `/etc/systemd/system/invoice-extractor.service`:
+After training, the models will be saved in the specified output directory. The pipeline will automatically use them as long as they're located in the "models" directory with the following structure:
 
 ```
-[Unit]
-Description=Invoice Extractor Gunicorn Service
-After=network.target
-
-[Service]
-User=ubuntu
-Group=ubuntu
-WorkingDirectory=/path/to/invoice-intellect-extractor
-ExecStart=/path/to/venv/bin/gunicorn app:app -w 4 -b 127.0.0.1:5000 --timeout 120
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
+models/
+├── entity_model.pth      # Entity classifier model
+├── relation_model.pth    # Relation extractor model
+├── layout_model.pth      # Layout-aware model
+└── spacy_ner/            # spaCy NER model directory
+    ├── model-best/       # Best model from spaCy training
+    └── ...
 ```
 
-2. Configure Nginx as a reverse proxy:
+## Machine Learning Methods
 
-```
-server {
-    listen 80;
-    server_name your-domain.com;
-
-    location / {
-        proxy_pass http://127.0.0.1:5000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        client_max_body_size 16M;
-    }
-}
-```
-
-3. Enable and start the service:
-
-```bash
-sudo systemctl enable invoice-extractor
-sudo systemctl start invoice-extractor
-sudo systemctl restart nginx
-```
+For details on the machine learning approaches used in this project, see the [ML Methods documentation](docs/ml-methods.md).
 
 ## Project Structure
 
@@ -445,6 +351,8 @@ invoice-intellect-extractor/
 ├── .devcontainer/                 # DevContainer configuration
 │   ├── devcontainer.json
 │   └── Dockerfile
+├── docs/                          # Documentation
+│   └── ml-methods.md              # ML methods documentation
 ├── src/
 │   ├── preprocessing/             # Image preprocessing
 │   │   ├── __init__.py
@@ -454,8 +362,9 @@ invoice-intellect-extractor/
 │   │   └── processor.py
 │   ├── models/                    # Machine learning models
 │   │   ├── __init__.py
-│   │   ├── entity_classifier.py
-│   │   └── relation_extractor.py
+│   │   ├── entity_classifier.py   # Entity classification with spaCy
+│   │   ├── relation_extractor.py  # Relation extraction
+│   │   └── layout_model.py        # LayoutLM-inspired model
 │   ├── utils/                     # Utility functions
 │   │   ├── __init__.py
 │   │   ├── image_utils.py
@@ -471,6 +380,9 @@ invoice-intellect-extractor/
 │   │   └── invoice.ts
 │   ├── __init__.py
 │   └── pipeline.py                # Main processing pipeline
+├── utils/
+│   └── create_sample_dataset.py   # Sample dataset generator
+├── models/                        # Trained models directory
 ├── app.py                         # Flask application
 ├── train.py                       # Model training script
 ├── requirements.txt               # Python dependencies
@@ -479,13 +391,12 @@ invoice-intellect-extractor/
 
 ## Future Improvements
 
-1. Implement a real feature extraction method using transformers like BERT
-2. Add a proper dataset class for loading real training data
-3. Implement more sophisticated table detection for invoice items
-4. Add validation and test sets for model evaluation
-5. Improve preprocessing for better OCR accuracy
-6. Add support for multiple languages
-7. Implement model fine-tuning for specific invoice formats
+1. Implement a full LayoutLM or LayoutLMv2 model for better spatial-aware extraction
+2. Improve the spaCy NER model with custom entity rules
+3. Add a document classifier to handle different invoice formats
+4. Implement more sophisticated table detection for invoice items
+5. Add support for multiple languages
+6. Integrate with large language models for zero-shot learning
 
 ## License
 
