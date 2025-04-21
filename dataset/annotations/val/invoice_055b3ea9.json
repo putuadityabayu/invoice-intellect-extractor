@@ -1,0 +1,559 @@
+{
+  "image_path": "images/val/invoice_055b3ea9.png",
+  "width": 2000,
+  "height": 2800,
+  "text_blocks": [
+    {
+      "id": 0,
+      "text": "Globex Industries",
+      "position": {
+        "x_min": 100,
+        "y_min": 100,
+        "x_max": 800,
+        "y_max": 160
+      },
+      "entity_type": "company_name"
+    },
+    {
+      "id": 1,
+      "text": "INVOICE",
+      "position": {
+        "x_min": 100,
+        "y_min": 180,
+        "x_max": 300,
+        "y_max": 230
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 2,
+      "text": "Invoice Number:",
+      "position": {
+        "x_min": 100,
+        "y_min": 230,
+        "x_max": 400,
+        "y_max": 270
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 3,
+      "text": "INV#4090#2021",
+      "position": {
+        "x_min": 400,
+        "y_min": 230,
+        "x_max": 700,
+        "y_max": 270
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 4,
+      "text": "Date:",
+      "position": {
+        "x_min": 1600,
+        "y_min": 230,
+        "x_max": 1750,
+        "y_max": 270
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 5,
+      "text": "22.05.2024",
+      "position": {
+        "x_min": 1750,
+        "y_min": 230,
+        "x_max": 2050,
+        "y_max": 270
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 6,
+      "text": "Bill To:",
+      "position": {
+        "x_min": 100,
+        "y_min": 310,
+        "x_max": 300,
+        "y_max": 350
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 7,
+      "text": "Jane Doe",
+      "position": {
+        "x_min": 100,
+        "y_min": 360,
+        "x_max": 600,
+        "y_max": 400
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 8,
+      "text": "Item",
+      "position": {
+        "x_min": 100,
+        "y_min": 460,
+        "x_max": 900,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 9,
+      "text": "Quantity",
+      "position": {
+        "x_min": 900,
+        "y_min": 460,
+        "x_max": 1100,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 10,
+      "text": "Unit Price",
+      "position": {
+        "x_min": 1100,
+        "y_min": 460,
+        "x_max": 1400,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 11,
+      "text": "Total",
+      "position": {
+        "x_min": 1400,
+        "y_min": 460,
+        "x_max": 1700,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 12,
+      "text": "Deluxe Sprocket",
+      "position": {
+        "x_min": 100,
+        "y_min": 530,
+        "x_max": 900,
+        "y_max": 570
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 13,
+      "text": "10",
+      "position": {
+        "x_min": 900,
+        "y_min": 530,
+        "x_max": 1100,
+        "y_max": 570
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 14,
+      "text": "$256.42",
+      "position": {
+        "x_min": 1100,
+        "y_min": 530,
+        "x_max": 1400,
+        "y_max": 570
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 15,
+      "text": "$2564.20",
+      "position": {
+        "x_min": 1400,
+        "y_min": 530,
+        "x_max": 1700,
+        "y_max": 570
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 16,
+      "text": "Software License",
+      "position": {
+        "x_min": 100,
+        "y_min": 590,
+        "x_max": 900,
+        "y_max": 630
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 17,
+      "text": "3",
+      "position": {
+        "x_min": 900,
+        "y_min": 590,
+        "x_max": 1100,
+        "y_max": 630
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 18,
+      "text": "$37.36",
+      "position": {
+        "x_min": 1100,
+        "y_min": 590,
+        "x_max": 1400,
+        "y_max": 630
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 19,
+      "text": "$112.08",
+      "position": {
+        "x_min": 1400,
+        "y_min": 590,
+        "x_max": 1700,
+        "y_max": 630
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 20,
+      "text": "Ultra Processor",
+      "position": {
+        "x_min": 100,
+        "y_min": 650,
+        "x_max": 900,
+        "y_max": 690
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 21,
+      "text": "9",
+      "position": {
+        "x_min": 900,
+        "y_min": 650,
+        "x_max": 1100,
+        "y_max": 690
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 22,
+      "text": "$193.80",
+      "position": {
+        "x_min": 1100,
+        "y_min": 650,
+        "x_max": 1400,
+        "y_max": 690
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 23,
+      "text": "$1744.20",
+      "position": {
+        "x_min": 1400,
+        "y_min": 650,
+        "x_max": 1700,
+        "y_max": 690
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 24,
+      "text": "Technical Support",
+      "position": {
+        "x_min": 100,
+        "y_min": 710,
+        "x_max": 900,
+        "y_max": 750
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 25,
+      "text": "5",
+      "position": {
+        "x_min": 900,
+        "y_min": 710,
+        "x_max": 1100,
+        "y_max": 750
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 26,
+      "text": "$338.15",
+      "position": {
+        "x_min": 1100,
+        "y_min": 710,
+        "x_max": 1400,
+        "y_max": 750
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 27,
+      "text": "$1690.75",
+      "position": {
+        "x_min": 1400,
+        "y_min": 710,
+        "x_max": 1700,
+        "y_max": 750
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 28,
+      "text": "Software License",
+      "position": {
+        "x_min": 100,
+        "y_min": 770,
+        "x_max": 900,
+        "y_max": 810
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 29,
+      "text": "5",
+      "position": {
+        "x_min": 900,
+        "y_min": 770,
+        "x_max": 1100,
+        "y_max": 810
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 30,
+      "text": "$291.31",
+      "position": {
+        "x_min": 1100,
+        "y_min": 770,
+        "x_max": 1400,
+        "y_max": 810
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 31,
+      "text": "$1456.55",
+      "position": {
+        "x_min": 1400,
+        "y_min": 770,
+        "x_max": 1700,
+        "y_max": 810
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 32,
+      "text": "Subtotal:",
+      "position": {
+        "x_min": 1100,
+        "y_min": 870,
+        "x_max": 1300,
+        "y_max": 910
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 33,
+      "text": "$7567.78",
+      "position": {
+        "x_min": 1400,
+        "y_min": 870,
+        "x_max": 1700,
+        "y_max": 910
+      },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 34,
+      "text": "Tax (15%):",
+      "position": {
+        "x_min": 1100,
+        "y_min": 920,
+        "x_max": 1300,
+        "y_max": 960
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 35,
+      "text": "$1105.07",
+      "position": {
+        "x_min": 1400,
+        "y_min": 920,
+        "x_max": 1700,
+        "y_max": 960
+      },
+      "entity_type": "tax"
+    },
+    {
+      "id": 36,
+      "text": "Total:",
+      "position": {
+        "x_min": 1100,
+        "y_min": 970,
+        "x_max": 1300,
+        "y_max": 1010
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 37,
+      "text": "$8672.85",
+      "position": {
+        "x_min": 1400,
+        "y_min": 970,
+        "x_max": 1700,
+        "y_max": 1010
+      },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 0,
+      "source_id": 12,
+      "target_id": 13,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 1,
+      "source_id": 12,
+      "target_id": 14,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 2,
+      "source_id": 12,
+      "target_id": 15,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 3,
+      "source_id": 16,
+      "target_id": 17,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 4,
+      "source_id": 16,
+      "target_id": 18,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 5,
+      "source_id": 16,
+      "target_id": 19,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 6,
+      "source_id": 20,
+      "target_id": 21,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 7,
+      "source_id": 20,
+      "target_id": 22,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 8,
+      "source_id": 20,
+      "target_id": 23,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 9,
+      "source_id": 24,
+      "target_id": 25,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 10,
+      "source_id": 24,
+      "target_id": 26,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 11,
+      "source_id": 24,
+      "target_id": 27,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 12,
+      "source_id": 28,
+      "target_id": 29,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 13,
+      "source_id": 28,
+      "target_id": 30,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 14,
+      "source_id": 28,
+      "target_id": 31,
+      "relation_type": "item_total"
+    }
+  ],
+  "metadata": {
+    "company_name": "Globex Industries",
+    "invoice_number": "INV#4090#2021",
+    "invoice_date": "22.05.2024",
+    "customer_name": "Jane Doe",
+    "items": [
+      {
+        "name": "Deluxe Sprocket",
+        "quantity": 10,
+        "unit_price": 256.42,
+        "total_price": 2564.2
+      },
+      {
+        "name": "Software License",
+        "quantity": 3,
+        "unit_price": 37.36,
+        "total_price": 112.08
+      },
+      {
+        "name": "Ultra Processor",
+        "quantity": 9,
+        "unit_price": 193.8,
+        "total_price": 1744.2
+      },
+      {
+        "name": "Technical Support",
+        "quantity": 5,
+        "unit_price": 338.15,
+        "total_price": 1690.75
+      },
+      {
+        "name": "Software License",
+        "quantity": 5,
+        "unit_price": 291.31,
+        "total_price": 1456.55
+      }
+    ],
+    "subtotal": 7567.78,
+    "tax": 1105.07,
+    "tax_rate": 0.14602300806841637,
+    "total": 8672.85
+  }
+}

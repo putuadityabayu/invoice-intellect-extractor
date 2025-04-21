@@ -1,0 +1,62 @@
+{
+  "dataset_name": "Invoice Extraction Sample Dataset",
+  "created_at": "2025-04-21T06:33:42.234784",
+  "num_train": 20,
+  "num_val": 5,
+  "num_test": 5,
+  "train_ids": [
+    "7c415c9c",
+    "5e317872",
+    "b21891e4",
+    "7729ee88",
+    "d2354d6c",
+    "161f12db",
+    "d95e68f1",
+    "186323e1",
+    "081b3a06",
+    "e070a049",
+    "8affc14d",
+    "3d5d6839",
+    "f7965563",
+    "b5c636ab",
+    "c38157c0",
+    "71d6fbb9",
+    "cbb36549",
+    "29a349c9",
+    "72657bf6",
+    "67ca4a22"
+  ],
+  "val_ids": [
+    "fa92a8f7",
+    "988fc52d",
+    "83c4b583",
+    "dd63ef5d",
+    "055b3ea9"
+  ],
+  "test_ids": [
+    "d53d2005",
+    "0036837e",
+    "e58d0c97",
+    "79f3b447",
+    "2ec7a930"
+  ],
+  "entity_types": [
+    "invoice_number",
+    "invoice_date",
+    "customer_name",
+    "item_name",
+    "item_quantity",
+    "item_price",
+    "subtotal",
+    "total",
+    "tax",
+    "company_name",
+    "label",
+    "table_header"
+  ],
+  "relation_types": [
+    "item_quantity",
+    "item_price",
+    "item_total"
+  ]
+}

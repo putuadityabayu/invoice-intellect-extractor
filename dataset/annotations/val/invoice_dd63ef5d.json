@@ -1,0 +1,287 @@
+{
+  "image_path": "images/val/invoice_dd63ef5d.png",
+  "width": 2000,
+  "height": 2800,
+  "text_blocks": [
+    {
+      "id": 0,
+      "text": "Stark Enterprises",
+      "position": {
+        "x_min": 100,
+        "y_min": 100,
+        "x_max": 800,
+        "y_max": 160
+      },
+      "entity_type": "company_name"
+    },
+    {
+      "id": 1,
+      "text": "INVOICE",
+      "position": {
+        "x_min": 100,
+        "y_min": 180,
+        "x_max": 300,
+        "y_max": 230
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 2,
+      "text": "Invoice Number:",
+      "position": {
+        "x_min": 100,
+        "y_min": 230,
+        "x_max": 400,
+        "y_max": 270
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 3,
+      "text": "9814",
+      "position": {
+        "x_min": 400,
+        "y_min": 230,
+        "x_max": 700,
+        "y_max": 270
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 4,
+      "text": "Date:",
+      "position": {
+        "x_min": 1600,
+        "y_min": 230,
+        "x_max": 1750,
+        "y_max": 270
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 5,
+      "text": "08/09/2024",
+      "position": {
+        "x_min": 1750,
+        "y_min": 230,
+        "x_max": 2050,
+        "y_max": 270
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 6,
+      "text": "Bill To:",
+      "position": {
+        "x_min": 100,
+        "y_min": 310,
+        "x_max": 300,
+        "y_max": 350
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 7,
+      "text": "Emily Williams",
+      "position": {
+        "x_min": 100,
+        "y_min": 360,
+        "x_max": 600,
+        "y_max": 400
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 8,
+      "text": "Item",
+      "position": {
+        "x_min": 100,
+        "y_min": 460,
+        "x_max": 900,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 9,
+      "text": "Quantity",
+      "position": {
+        "x_min": 900,
+        "y_min": 460,
+        "x_max": 1100,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 10,
+      "text": "Unit Price",
+      "position": {
+        "x_min": 1100,
+        "y_min": 460,
+        "x_max": 1400,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 11,
+      "text": "Total",
+      "position": {
+        "x_min": 1400,
+        "y_min": 460,
+        "x_max": 1700,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 12,
+      "text": "Software License",
+      "position": {
+        "x_min": 100,
+        "y_min": 530,
+        "x_max": 900,
+        "y_max": 570
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 13,
+      "text": "3",
+      "position": {
+        "x_min": 900,
+        "y_min": 530,
+        "x_max": 1100,
+        "y_max": 570
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 14,
+      "text": "$41.74",
+      "position": {
+        "x_min": 1100,
+        "y_min": 530,
+        "x_max": 1400,
+        "y_max": 570
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 15,
+      "text": "$125.22",
+      "position": {
+        "x_min": 1400,
+        "y_min": 530,
+        "x_max": 1700,
+        "y_max": 570
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 16,
+      "text": "Subtotal:",
+      "position": {
+        "x_min": 1100,
+        "y_min": 630,
+        "x_max": 1300,
+        "y_max": 670
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 17,
+      "text": "$125.22",
+      "position": {
+        "x_min": 1400,
+        "y_min": 630,
+        "x_max": 1700,
+        "y_max": 670
+      },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 18,
+      "text": "Tax (6%):",
+      "position": {
+        "x_min": 1100,
+        "y_min": 680,
+        "x_max": 1300,
+        "y_max": 720
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 19,
+      "text": "$7.16",
+      "position": {
+        "x_min": 1400,
+        "y_min": 680,
+        "x_max": 1700,
+        "y_max": 720
+      },
+      "entity_type": "tax"
+    },
+    {
+      "id": 20,
+      "text": "Total:",
+      "position": {
+        "x_min": 1100,
+        "y_min": 730,
+        "x_max": 1300,
+        "y_max": 770
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 21,
+      "text": "$132.38",
+      "position": {
+        "x_min": 1400,
+        "y_min": 730,
+        "x_max": 1700,
+        "y_max": 770
+      },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 0,
+      "source_id": 12,
+      "target_id": 13,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 1,
+      "source_id": 12,
+      "target_id": 14,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 2,
+      "source_id": 12,
+      "target_id": 15,
+      "relation_type": "item_total"
+    }
+  ],
+  "metadata": {
+    "company_name": "Stark Enterprises",
+    "invoice_number": "9814",
+    "invoice_date": "08/09/2024",
+    "customer_name": "Emily Williams",
+    "items": [
+      {
+        "name": "Software License",
+        "quantity": 3,
+        "unit_price": 41.74,
+        "total_price": 125.22
+      }
+    ],
+    "subtotal": 125.22,
+    "tax": 7.16,
+    "tax_rate": 0.057179364318798914,
+    "total": 132.38
+  }
+}

@@ -1,0 +1,355 @@
+{
+  "image_path": "images/train/invoice_186323e1.png",
+  "width": 2000,
+  "height": 2800,
+  "text_blocks": [
+    {
+      "id": 0,
+      "text": "Oscorp Industries",
+      "position": {
+        "x_min": 100,
+        "y_min": 100,
+        "x_max": 800,
+        "y_max": 160
+      },
+      "entity_type": "company_name"
+    },
+    {
+      "id": 1,
+      "text": "INVOICE",
+      "position": {
+        "x_min": 100,
+        "y_min": 180,
+        "x_max": 300,
+        "y_max": 230
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 2,
+      "text": "Invoice Number:",
+      "position": {
+        "x_min": 100,
+        "y_min": 230,
+        "x_max": 400,
+        "y_max": 270
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 3,
+      "text": "I-2021-1845",
+      "position": {
+        "x_min": 400,
+        "y_min": 230,
+        "x_max": 700,
+        "y_max": 270
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 4,
+      "text": "Date:",
+      "position": {
+        "x_min": 1600,
+        "y_min": 230,
+        "x_max": 1750,
+        "y_max": 270
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 5,
+      "text": "24-10-2024",
+      "position": {
+        "x_min": 1750,
+        "y_min": 230,
+        "x_max": 2050,
+        "y_max": 270
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 6,
+      "text": "Bill To:",
+      "position": {
+        "x_min": 100,
+        "y_min": 310,
+        "x_max": 300,
+        "y_max": 350
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 7,
+      "text": "XYZ Ltd",
+      "position": {
+        "x_min": 100,
+        "y_min": 360,
+        "x_max": 600,
+        "y_max": 400
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 8,
+      "text": "Item",
+      "position": {
+        "x_min": 100,
+        "y_min": 460,
+        "x_max": 900,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 9,
+      "text": "Quantity",
+      "position": {
+        "x_min": 900,
+        "y_min": 460,
+        "x_max": 1100,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 10,
+      "text": "Unit Price",
+      "position": {
+        "x_min": 1100,
+        "y_min": 460,
+        "x_max": 1400,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 11,
+      "text": "Total",
+      "position": {
+        "x_min": 1400,
+        "y_min": 460,
+        "x_max": 1700,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 12,
+      "text": "Maintenance Contract",
+      "position": {
+        "x_min": 100,
+        "y_min": 530,
+        "x_max": 900,
+        "y_max": 570
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 13,
+      "text": "8",
+      "position": {
+        "x_min": 900,
+        "y_min": 530,
+        "x_max": 1100,
+        "y_max": 570
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 14,
+      "text": "$135.69",
+      "position": {
+        "x_min": 1100,
+        "y_min": 530,
+        "x_max": 1400,
+        "y_max": 570
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 15,
+      "text": "$1085.52",
+      "position": {
+        "x_min": 1400,
+        "y_min": 530,
+        "x_max": 1700,
+        "y_max": 570
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 16,
+      "text": "Maintenance Contract",
+      "position": {
+        "x_min": 100,
+        "y_min": 590,
+        "x_max": 900,
+        "y_max": 630
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 17,
+      "text": "6",
+      "position": {
+        "x_min": 900,
+        "y_min": 590,
+        "x_max": 1100,
+        "y_max": 630
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 18,
+      "text": "$110.52",
+      "position": {
+        "x_min": 1100,
+        "y_min": 590,
+        "x_max": 1400,
+        "y_max": 630
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 19,
+      "text": "$663.12",
+      "position": {
+        "x_min": 1400,
+        "y_min": 590,
+        "x_max": 1700,
+        "y_max": 630
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 20,
+      "text": "Subtotal:",
+      "position": {
+        "x_min": 1100,
+        "y_min": 690,
+        "x_max": 1300,
+        "y_max": 730
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 21,
+      "text": "$1748.64",
+      "position": {
+        "x_min": 1400,
+        "y_min": 690,
+        "x_max": 1700,
+        "y_max": 730
+      },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 22,
+      "text": "Tax (20%):",
+      "position": {
+        "x_min": 1100,
+        "y_min": 740,
+        "x_max": 1300,
+        "y_max": 780
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 23,
+      "text": "$356.23",
+      "position": {
+        "x_min": 1400,
+        "y_min": 740,
+        "x_max": 1700,
+        "y_max": 780
+      },
+      "entity_type": "tax"
+    },
+    {
+      "id": 24,
+      "text": "Total:",
+      "position": {
+        "x_min": 1100,
+        "y_min": 790,
+        "x_max": 1300,
+        "y_max": 830
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 25,
+      "text": "$2104.87",
+      "position": {
+        "x_min": 1400,
+        "y_min": 790,
+        "x_max": 1700,
+        "y_max": 830
+      },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 0,
+      "source_id": 12,
+      "target_id": 13,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 1,
+      "source_id": 12,
+      "target_id": 14,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 2,
+      "source_id": 12,
+      "target_id": 15,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 3,
+      "source_id": 16,
+      "target_id": 17,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 4,
+      "source_id": 16,
+      "target_id": 18,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 5,
+      "source_id": 16,
+      "target_id": 19,
+      "relation_type": "item_total"
+    }
+  ],
+  "metadata": {
+    "company_name": "Oscorp Industries",
+    "invoice_number": "I-2021-1845",
+    "invoice_date": "24-10-2024",
+    "customer_name": "XYZ Ltd",
+    "items": [
+      {
+        "name": "Maintenance Contract",
+        "quantity": 8,
+        "unit_price": 135.69,
+        "total_price": 1085.52
+      },
+      {
+        "name": "Maintenance Contract",
+        "quantity": 6,
+        "unit_price": 110.52,
+        "total_price": 663.12
+      }
+    ],
+    "subtotal": 1748.6399999999999,
+    "tax": 356.23,
+    "tax_rate": 0.2037183182358862,
+    "total": 2104.87
+  }
+}

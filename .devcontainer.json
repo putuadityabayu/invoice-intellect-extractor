@@ -5,27 +5,5 @@
   "forwardPorts": [5000,3000],
   "build": {
     "dockerfile":  "Dockerfile.DEV"
-  },
-  "mounts": [
-    {
-      "source": "${localWorkspaceFolder}/.git",
-      "target": "/app/.git",
-      "type": "bind"
-    },
-    {
-      "source": "${localWorkspaceFolder}/dataset",
-      "target": "/app/dataset",
-      "type": "bind"
-    },
-    {
-      "source": "${localWorkspaceFolder}/models",
-      "target": "/app/models",
-      "type": "bind"
-    },
-    {
-      "source": "${localWorkspaceFolder}/temp_uploads",
-      "target": "/app/temp_uploads",
-      "type": "bind"
-    }
-  ]
+  }
 }

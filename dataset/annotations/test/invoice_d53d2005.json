@@ -1,0 +1,423 @@
+{
+  "image_path": "images/test/invoice_d53d2005.png",
+  "width": 2000,
+  "height": 2800,
+  "text_blocks": [
+    {
+      "id": 0,
+      "text": "Soylent Corp",
+      "position": {
+        "x_min": 100,
+        "y_min": 100,
+        "x_max": 800,
+        "y_max": 160
+      },
+      "entity_type": "company_name"
+    },
+    {
+      "id": 1,
+      "text": "INVOICE",
+      "position": {
+        "x_min": 100,
+        "y_min": 180,
+        "x_max": 300,
+        "y_max": 230
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 2,
+      "text": "Invoice Number:",
+      "position": {
+        "x_min": 100,
+        "y_min": 230,
+        "x_max": 400,
+        "y_max": 270
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 3,
+      "text": "INV9547",
+      "position": {
+        "x_min": 400,
+        "y_min": 230,
+        "x_max": 700,
+        "y_max": 270
+      },
+      "entity_type": "invoice_number"
+    },
+    {
+      "id": 4,
+      "text": "Date:",
+      "position": {
+        "x_min": 1600,
+        "y_min": 230,
+        "x_max": 1750,
+        "y_max": 270
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 5,
+      "text": "10-10-2024",
+      "position": {
+        "x_min": 1750,
+        "y_min": 230,
+        "x_max": 2050,
+        "y_max": 270
+      },
+      "entity_type": "invoice_date"
+    },
+    {
+      "id": 6,
+      "text": "Bill To:",
+      "position": {
+        "x_min": 100,
+        "y_min": 310,
+        "x_max": 300,
+        "y_max": 350
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 7,
+      "text": "Michael Brown",
+      "position": {
+        "x_min": 100,
+        "y_min": 360,
+        "x_max": 600,
+        "y_max": 400
+      },
+      "entity_type": "customer_name"
+    },
+    {
+      "id": 8,
+      "text": "Item",
+      "position": {
+        "x_min": 100,
+        "y_min": 460,
+        "x_max": 900,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 9,
+      "text": "Quantity",
+      "position": {
+        "x_min": 900,
+        "y_min": 460,
+        "x_max": 1100,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 10,
+      "text": "Unit Price",
+      "position": {
+        "x_min": 1100,
+        "y_min": 460,
+        "x_max": 1400,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 11,
+      "text": "Total",
+      "position": {
+        "x_min": 1400,
+        "y_min": 460,
+        "x_max": 1700,
+        "y_max": 500
+      },
+      "entity_type": "table_header"
+    },
+    {
+      "id": 12,
+      "text": "Professional Tool",
+      "position": {
+        "x_min": 100,
+        "y_min": 530,
+        "x_max": 900,
+        "y_max": 570
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 13,
+      "text": "6",
+      "position": {
+        "x_min": 900,
+        "y_min": 530,
+        "x_max": 1100,
+        "y_max": 570
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 14,
+      "text": "$449.45",
+      "position": {
+        "x_min": 1100,
+        "y_min": 530,
+        "x_max": 1400,
+        "y_max": 570
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 15,
+      "text": "$2696.70",
+      "position": {
+        "x_min": 1400,
+        "y_min": 530,
+        "x_max": 1700,
+        "y_max": 570
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 16,
+      "text": "Deluxe Sprocket",
+      "position": {
+        "x_min": 100,
+        "y_min": 590,
+        "x_max": 900,
+        "y_max": 630
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 17,
+      "text": "6",
+      "position": {
+        "x_min": 900,
+        "y_min": 590,
+        "x_max": 1100,
+        "y_max": 630
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 18,
+      "text": "$232.94",
+      "position": {
+        "x_min": 1100,
+        "y_min": 590,
+        "x_max": 1400,
+        "y_max": 630
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 19,
+      "text": "$1397.64",
+      "position": {
+        "x_min": 1400,
+        "y_min": 590,
+        "x_max": 1700,
+        "y_max": 630
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 20,
+      "text": "Professional Tool",
+      "position": {
+        "x_min": 100,
+        "y_min": 650,
+        "x_max": 900,
+        "y_max": 690
+      },
+      "entity_type": "item_name"
+    },
+    {
+      "id": 21,
+      "text": "8",
+      "position": {
+        "x_min": 900,
+        "y_min": 650,
+        "x_max": 1100,
+        "y_max": 690
+      },
+      "entity_type": "item_quantity"
+    },
+    {
+      "id": 22,
+      "text": "$148.32",
+      "position": {
+        "x_min": 1100,
+        "y_min": 650,
+        "x_max": 1400,
+        "y_max": 690
+      },
+      "entity_type": "item_price"
+    },
+    {
+      "id": 23,
+      "text": "$1186.56",
+      "position": {
+        "x_min": 1400,
+        "y_min": 650,
+        "x_max": 1700,
+        "y_max": 690
+      },
+      "entity_type": "item_total"
+    },
+    {
+      "id": 24,
+      "text": "Subtotal:",
+      "position": {
+        "x_min": 1100,
+        "y_min": 750,
+        "x_max": 1300,
+        "y_max": 790
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 25,
+      "text": "$5280.90",
+      "position": {
+        "x_min": 1400,
+        "y_min": 750,
+        "x_max": 1700,
+        "y_max": 790
+      },
+      "entity_type": "subtotal"
+    },
+    {
+      "id": 26,
+      "text": "Tax (21%):",
+      "position": {
+        "x_min": 1100,
+        "y_min": 800,
+        "x_max": 1300,
+        "y_max": 840
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 27,
+      "text": "$1109.81",
+      "position": {
+        "x_min": 1400,
+        "y_min": 800,
+        "x_max": 1700,
+        "y_max": 840
+      },
+      "entity_type": "tax"
+    },
+    {
+      "id": 28,
+      "text": "Total:",
+      "position": {
+        "x_min": 1100,
+        "y_min": 850,
+        "x_max": 1300,
+        "y_max": 890
+      },
+      "entity_type": "label"
+    },
+    {
+      "id": 29,
+      "text": "$6390.71",
+      "position": {
+        "x_min": 1400,
+        "y_min": 850,
+        "x_max": 1700,
+        "y_max": 890
+      },
+      "entity_type": "total"
+    }
+  ],
+  "relations": [
+    {
+      "id": 0,
+      "source_id": 12,
+      "target_id": 13,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 1,
+      "source_id": 12,
+      "target_id": 14,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 2,
+      "source_id": 12,
+      "target_id": 15,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 3,
+      "source_id": 16,
+      "target_id": 17,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 4,
+      "source_id": 16,
+      "target_id": 18,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 5,
+      "source_id": 16,
+      "target_id": 19,
+      "relation_type": "item_total"
+    },
+    {
+      "id": 6,
+      "source_id": 20,
+      "target_id": 21,
+      "relation_type": "item_quantity"
+    },
+    {
+      "id": 7,
+      "source_id": 20,
+      "target_id": 22,
+      "relation_type": "item_price"
+    },
+    {
+      "id": 8,
+      "source_id": 20,
+      "target_id": 23,
+      "relation_type": "item_total"
+    }
+  ],
+  "metadata": {
+    "company_name": "Soylent Corp",
+    "invoice_number": "INV9547",
+    "invoice_date": "10-10-2024",
+    "customer_name": "Michael Brown",
+    "items": [
+      {
+        "name": "Professional Tool",
+        "quantity": 6,
+        "unit_price": 449.45,
+        "total_price": 2696.7
+      },
+      {
+        "name": "Deluxe Sprocket",
+        "quantity": 6,
+        "unit_price": 232.94,
+        "total_price": 1397.64
+      },
+      {
+        "name": "Professional Tool",
+        "quantity": 8,
+        "unit_price": 148.32,
+        "total_price": 1186.56
+      }
+    ],
+    "subtotal": 5280.9,
+    "tax": 1109.81,
+    "tax_rate": 0.21015546592436896,
+    "total": 6390.71
+  }
+}

@@ -1,0 +1,141 @@
+Text: 'Jus:' (conf: 0.52)
+Position: x_min=0.299, y_min=0.268, x_max=0.372, y_max=0.295
+
+Text: 'Emak' (conf: 0.62)
+Position: x_min=0.370, y_min=0.270, x_max=0.453, y_max=0.296
+
+Text: 'Jumbo' (conf: 0.71)
+Position: x_min=0.451, y_min=0.271, x_max=0.549, y_max=0.298
+
+Text: 'Plus' (conf: 0.94)
+Position: x_min=0.550, y_min=0.273, x_max=0.630, y_max=0.301
+
+Text: 'KOTA' (conf: 0.94)
+Position: x_min=0.365, y_min=0.317, x_max=0.450, y_max=0.341
+
+Text: 'MALANG' (conf: 0.98)
+Position: x_min=0.453, y_min=0.319, x_max=0.562, y_max=0.342
+
+Text: '#6282234604032' (conf: 0.51)
+Position: x_min=0.349, y_min=0.343, x_max=0.585, y_max=0.364
+
+Text: 'Kode' (conf: 0.88)
+Position: x_min=0.188, y_min=0.387, x_max=0.273, y_max=0.410
+
+Text: 'struk:' (conf: 0.97)
+Position: x_min=0.276, y_min=0.387, x_max=0.389, y_max=0.412
+
+Text: 'QD4R2LKJ7R96M' (conf: 0.63)
+Position: x_min=0.399, y_min=0.391, x_max=0.616, y_max=0.412
+
+Text: 'Tanggal:' (conf: 0.88)
+Position: x_min=0.191, y_min=0.410, x_max=0.337, y_max=0.436
+
+Text: '14-02-2025' (conf: 0.58)
+Position: x_min=0.347, y_min=0.412, x_max=0.524, y_max=0.437
+
+Text: '07:32:45' (conf: 0.97)
+Position: x_min=0.528, y_min=0.413, x_max=0.670, y_max=0.438
+
+Text: 'Kasin:' (conf: 0.29)
+Position: x_min=0.186, y_min=0.434, x_max=0.299, y_max=0.460
+
+Text: 'Agshall' (conf: 0.68)
+Position: x_min=0.307, y_min=0.434, x_max=0.444, y_max=0.462
+
+Text: 'Pelanggan:' (conf: 0.69)
+Position: x_min=0.189, y_min=0.459, x_max=0.363, y_max=0.484
+
+Text: 'andreas' (conf: 0.99)
+Position: x_min=0.378, y_min=0.461, x_max=0.502, y_max=0.483
+
+Text: 'Jus' (conf: 1.00)
+Position: x_min=0.184, y_min=0.505, x_max=0.253, y_max=0.533
+
+Text: 'Semangka' (conf: 0.88)
+Position: x_min=0.257, y_min=0.506, x_max=0.399, y_max=0.531
+
+Text: 'Jumbo' (conf: 0.80)
+Position: x_min=0.410, y_min=0.506, x_max=0.505, y_max=0.532
+
+Text: 'X1:' (conf: 0.32)
+Position: x_min=0.502, y_min=0.506, x_max=0.597, y_max=0.533
+
+Text: '12.000' (conf: 0.99)
+Position: x_min=0.611, y_min=0.508, x_max=0.719, y_max=0.530
+
+Text: 'Jus' (conf: 0.99)
+Position: x_min=0.182, y_min=0.527, x_max=0.253, y_max=0.556
+
+Text: 'Namas' (conf: 0.85)
+Position: x_min=0.255, y_min=0.528, x_max=0.352, y_max=0.555
+
+Text: 'Jumbor' (conf: 0.60)
+Position: x_min=0.358, y_min=0.529, x_max=0.460, y_max=0.556
+
+Text: 'X' (conf: 0.94)
+Position: x_min=0.455, y_min=0.532, x_max=0.502, y_max=0.556
+
+Text: '1' (conf: 1.00)
+Position: x_min=0.488, y_min=0.531, x_max=0.521, y_max=0.554
+
+Text: '12.000' (conf: 0.99)
+Position: x_min=0.609, y_min=0.530, x_max=0.722, y_max=0.556
+
+Text: '24,000' (conf: 0.91)
+Position: x_min=0.609, y_min=0.577, x_max=0.722, y_max=0.603
+
+Text: '24,000' (conf: 0.88)
+Position: x_min=0.609, y_min=0.625, x_max=0.722, y_max=0.650
+
+Text: 'Total' (conf: 1.00)
+Position: x_min=0.181, y_min=0.576, x_max=0.280, y_max=0.603
+
+Text: 'QRIS' (conf: 0.98)
+Position: x_min=0.175, y_min=0.626, x_max=0.262, y_max=0.652
+
+Text: 'Kembali' (conf: 0.85)
+Position: x_min=0.170, y_min=0.647, x_max=0.316, y_max=0.680
+
+Text: '0' (conf: 0.52)
+Position: x_min=0.700, y_min=0.654, x_max=0.717, y_max=0.667
+
+Text: 'Rk' (conf: 0.23)
+Position: x_min=0.356, y_min=0.700, x_max=0.411, y_max=0.725
+
+Text: 'LUNAS' (conf: 0.99)
+Position: x_min=0.413, y_min=0.699, x_max=0.510, y_max=0.726
+
+Text: '*' (conf: 0.26)
+Position: x_min=0.517, y_min=0.700, x_max=0.564, y_max=0.723
+
+Text: 'Kumpulkan' (conf: 0.79)
+Position: x_min=0.170, y_min=0.752, x_max=0.344, y_max=0.780
+
+Text: '10.' (conf: 0.37)
+Position: x_min=0.352, y_min=0.751, x_max=0.410, y_max=0.778
+
+Text: 'Nota,' (conf: 0.61)
+Position: x_min=0.403, y_min=0.751, x_max=0.493, y_max=0.777
+
+Text: 'Gratis' (conf: 0.99)
+Position: x_min=0.507, y_min=0.750, x_max=0.623, y_max=0.776
+
+Text: 'Jus' (conf: 0.99)
+Position: x_min=0.627, y_min=0.749, x_max=0.696, y_max=0.777
+
+Text: '10' (conf: 0.55)
+Position: x_min=0.701, y_min=0.749, x_max=0.750, y_max=0.776
+
+Text: 'K' (conf: 0.62)
+Position: x_min=0.306, y_min=0.776, x_max=0.359, y_max=0.805
+
+Text: '(Ber' (conf: 0.65)
+Position: x_min=0.351, y_min=0.776, x_max=0.431, y_max=0.805
+
+Text: 'laku' (conf: 0.85)
+Position: x_min=0.425, y_min=0.775, x_max=0.502, y_max=0.804
+
+Text: '2025)' (conf: 0.99)
+Position: x_min=0.507, y_min=0.774, x_max=0.606, y_max=0.805
+
