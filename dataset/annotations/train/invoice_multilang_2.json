@@ -1,79 +1,128 @@
 
 {
-  "image_path": "images/train/invoice_multilang_2.jpg",
-  "width": 1000,
-  "height": 1400,
   "text_blocks": [
     {
-      "id": 1,
-      "text": "Fattura n°: IT-1002",
-      "position": { "x_min": 120, "y_min": 140, "x_max": 300, "y_max": 165 },
+      "text": "FAKTUR PENJUALAN",
+      "position": {"x_min": 200, "y_min": 50, "x_max": 400, "y_max": 80},
+      "entity_type": "header"
+    },
+    {
+      "text": "No. Faktur: INV/2025/03/001",
+      "position": {"x_min": 50, "y_min": 100, "x_max": 250, "y_max": 120},
       "entity_type": "invoice_number"
     },
     {
-      "id": 2,
-      "text": "Data: 21-03-2023",
-      "position": { "x_min": 120, "y_min": 180, "x_max": 300, "y_max": 205 },
+      "text": "Tanggal: 15 Maret 2025",
+      "position": {"x_min": 300, "y_min": 100, "x_max": 500, "y_max": 120},
       "entity_type": "invoice_date"
     },
     {
-      "id": 3,
-      "text": "Cliente: Mario Rossi",
-      "position": { "x_min": 120, "y_min": 240, "x_max": 450, "y_max": 265 },
+      "text": "Kepada Yth:\nPT. Maju Bersama\nJl. Sudirman No. 123\nJakarta Pusat",
+      "position": {"x_min": 50, "y_min": 150, "x_max": 300, "y_max": 220},
       "entity_type": "customer_name"
     },
     {
-      "id": 4,
-      "text": "Tablet",
-      "position": { "x_min": 120, "y_min": 320, "x_max": 400, "y_max": 345 },
+      "text": "Laptop Asus ROG",
+      "position": {"x_min": 50, "y_min": 250, "x_max": 200, "y_max": 270},
       "entity_type": "item_name"
     },
     {
-      "id": 5,
-      "text": "1",
-      "position": { "x_min": 500, "y_min": 320, "x_max": 550, "y_max": 345 },
+      "text": "2 unit",
+      "position": {"x_min": 220, "y_min": 250, "x_max": 280, "y_max": 270},
       "entity_type": "item_quantity"
     },
     {
-      "id": 6,
-      "text": "€455,00",
-      "position": { "x_min": 600, "y_min": 320, "x_max": 700, "y_max": 345 },
+      "text": "Rp 15.000.000",
+      "position": {"x_min": 300, "y_min": 250, "x_max": 400, "y_max": 270},
       "entity_type": "item_price"
     },
     {
-      "id": 7,
-      "text": "€455,00",
-      "position": { "x_min": 800, "y_min": 320, "x_max": 940, "y_max": 345 },
+      "text": "Rp 30.000.000",
+      "position": {"x_min": 420, "y_min": 250, "x_max": 520, "y_max": 270},
+      "entity_type": "item_total"
+    },
+    {
+      "text": "Monitor Gaming 27\"",
+      "position": {"x_min": 50, "y_min": 280, "x_max": 200, "y_max": 300},
+      "entity_type": "item_name"
+    },
+    {
+      "text": "1 unit",
+      "position": {"x_min": 220, "y_min": 280, "x_max": 280, "y_max": 300},
+      "entity_type": "item_quantity"
+    },
+    {
+      "text": "Rp 5.000.000",
+      "position": {"x_min": 300, "y_min": 280, "x_max": 400, "y_max": 300},
       "entity_type": "item_price"
     },
     {
-      "id": 8,
-      "text": "Totale parziale: €455,00",
-      "position": { "x_min": 800, "y_min": 410, "x_max": 940, "y_max": 435 },
+      "text": "Rp 5.000.000",
+      "position": {"x_min": 420, "y_min": 280, "x_max": 520, "y_max": 300},
+      "entity_type": "item_total"
+    },
+    {
+      "text": "Subtotal",
+      "position": {"x_min": 300, "y_min": 320, "x_max": 400, "y_max": 340},
+      "entity_type": "subtotal_label"
+    },
+    {
+      "text": "Rp 35.000.000",
+      "position": {"x_min": 420, "y_min": 320, "x_max": 520, "y_max": 340},
       "entity_type": "subtotal"
     },
     {
-      "id": 9,
-      "text": "IVA 22%: €100,10",
-      "position": { "x_min": 800, "y_min": 450, "x_max": 940, "y_max": 475 },
-      "entity_type": "item_price"
+      "text": "PPN 11%",
+      "position": {"x_min": 300, "y_min": 350, "x_max": 400, "y_max": 370},
+      "entity_type": "tax_label"
     },
     {
-      "id": 10,
-      "text": "Totale: €555,10",
-      "position": { "x_min": 800, "y_min": 490, "x_max": 940, "y_max": 515 },
+      "text": "Rp 3.850.000",
+      "position": {"x_min": 420, "y_min": 350, "x_max": 520, "y_max": 370},
+      "entity_type": "tax"
+    },
+    {
+      "text": "Total",
+      "position": {"x_min": 300, "y_min": 380, "x_max": 400, "y_max": 400},
+      "entity_type": "total_label"
+    },
+    {
+      "text": "Rp 38.850.000",
+      "position": {"x_min": 420, "y_min": 380, "x_max": 520, "y_max": 400},
       "entity_type": "total"
     }
   ],
   "relations": [
     {
-      "id": 1, "source_id": 4, "target_id": 5, "relation_type": "item_quantity"
+      "head": 4,
+      "tail": 5,
+      "type": "item_quantity"
     },
     {
-      "id": 2, "source_id": 4, "target_id": 6, "relation_type": "item_price"
+      "head": 4,
+      "tail": 6,
+      "type": "item_price"
     },
     {
-      "id": 3, "source_id": 4, "target_id": 7, "relation_type": "item_total"
+      "head": 4,
+      "tail": 7,
+      "type": "item_total"
+    },
+    {
+      "head": 8,
+      "tail": 9,
+      "type": "item_quantity"
+    },
+    {
+      "head": 8,
+      "tail": 10,
+      "type": "item_price"
+    },
+    {
+      "head": 8,
+      "tail": 11,
+      "type": "item_total"
     }
-  ]
+  ],
+  "image_path": "dataset/images/train/invoice_multilang_2.jpg"
 }

@@ -335,3 +335,269 @@ def parse_extra_price(text):
         return "shipping", value
     else:
         return "other", value
+
+def prepare_spacy_training_data(data_dir):
+    """
+    Prepare training data for spaCy NER model with proper config format
+    """
+    if not SPACY_AVAILABLE:
+        print("spaCy not available. Skipping NER preparation.")
+        return False
+    
+    # Create output directory
+    output_dir = os.path.join(os.path.dirname(data_dir), "models", "spacy_ner")
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Create config in proper .cfg format
+    config_text = """
+[paths]
+train = "corpus/train.spacy"
+dev = "corpus/dev.spacy"
+vectors = null
+init_tok2vec = null
+
+[system]
+gpu_allocator = "pytorch"
+
+[nlp]
+lang = "id"
+pipeline = ["tok2vec","ner"]
+batch_size = 128
+disabled = []
+before_creation = null
+after_creation = null
+after_pipeline_creation = null
+
+[components]
+
+[components.tok2vec]
+factory = "tok2vec"
+
+[components.tok2vec.model]
+@architectures = "spacy.Tok2Vec.v2"
+
+[components.tok2vec.model.embed]
+@architectures = "spacy.MultiHashEmbed.v2"
+width = ${components.tok2vec.model.encode.width}
+attrs = ["NORM", "PREFIX", "SUFFIX", "SHAPE"]
+rows = [5000, 2500, 2500, 2500]
+include_static_vectors = false
+
+[components.tok2vec.model.encode]
+@architectures = "spacy.MaxoutWindowEncoder.v2"
+width = 256
+depth = 8
+window_size = 1
+maxout_pieces = 3
+
+[components.ner]
+factory = "ner"
+
+[components.ner.model]
+@architectures = "spacy.TransitionBasedParser.v2"
+state_type = "ner"
+extra_state_tokens = false
+hidden_width = 64
+maxout_pieces = 2
+use_upper = false
+nO = null
+
+[components.ner.model.tok2vec]
+@architectures = "spacy.Tok2VecListener.v1"
+width = ${components.tok2vec.model.encode.width}
+
+[corpora]
+
+[corpora.train]
+@readers = "spacy.Corpus.v1"
+path = ${paths.train}
+max_length = 0
+gold_preproc = false
+limit = 0
+augmenter = null
+
+[corpora.dev]
+@readers = "spacy.Corpus.v1"
+path = ${paths.dev}
+max_length = 0
+gold_preproc = false
+limit = 0
+augmenter = null
+
+[training]
+accumulate_gradient = 1
+dev_corpus = "corpora.dev"
+train_corpus = "corpora.train"
+seed = 0
+gpu_allocator = "pytorch"
+dropout = 0.1
+patience = 1600
+max_epochs = 0
+max_steps = 20000
+eval_frequency = 200
+frozen_components = []
+before_to_disk = null
+batcher = {"@batchers": "spacy.batch_by_words.v1", "discard_oversize": true, "size": 2000, "tolerance": 0.2, "get_length": null}
+
+[training.optimizer]
+@optimizers = "Adam.v1"
+beta1 = 0.9
+beta2 = 0.999
+L2_is_weight_decay = true
+L2 = 0.01
+grad_clip = 1.0
+use_averages = false
+eps = 0.00000001
+
+[training.optimizer.learn_rate]
+@schedules = "warmup_linear.v1"
+warmup_steps = 250
+total_steps = 20000
+initial_rate = 0.00005
+
+[training.score_weights]
+ents_f = 1.0
+ents_p = 0.0
+ents_r = 0.0
+
+[pretraining]
+
+[initialize]
+vectors = null
+init_tok2vec = null
+vocab_data = null
+lookups = null
+before_init = null
+after_init = null
+
+[initialize.components]
+
+[initialize.tokenizer]
+"""
+    
+    # Save config in .cfg format
+    config_path = os.path.join(output_dir, "config.cfg")
+    with open(config_path, "w", encoding="utf-8") as f:
+        f.write(config_text.strip())
+    
+    # Load base model
+    try:
+        nlp = spacy.blank("id")
+    except Exception as e:
+        print(f"Error loading spaCy model: {e}")
+        return False
+    
+    # Create DocBin to store training documents
+    train_doc_bin = DocBin()
+    val_doc_bin = DocBin()
+    
+    # Entity labels we want to train
+    entity_labels = ["INVOICE_NUMBER", "DATE", "CUSTOMER", "ITEM", "QUANTITY", "PRICE", "SUBTOTAL", "TOTAL"]
+    
+    # Add entity labels to NER pipe
+    ner = nlp.add_pipe("ner")
+    for label in entity_labels:
+        ner.add_label(label)
+    
+    # Map our entity types to spaCy format
+    entity_map = {
+        "invoice_number": "INVOICE_NUMBER",
+        "invoice_date": "DATE",
+        "customer_name": "CUSTOMER",
+        "item_name": "ITEM",
+        "item_quantity": "QUANTITY",
+        "item_price": "PRICE",
+        "subtotal": "SUBTOTAL",
+        "total": "TOTAL"
+    }
+    
+    # Process training data
+    print("Preparing spaCy NER training data...")
+    
+    for split in ["train", "val"]:
+        annotations_dir = os.path.join(data_dir, "annotations", split)
+        
+        if not os.path.exists(annotations_dir):
+            print(f"Directory not found: {annotations_dir}")
+            continue
+        
+        for ann_file in tqdm(os.listdir(annotations_dir)):
+            if not ann_file.endswith(".json"):
+                continue
+                
+            with open(os.path.join(annotations_dir, ann_file), "r") as f:
+                try:
+                    annotation = json.load(f)
+                except json.JSONDecodeError:
+                    print(f"Error parsing JSON file: {ann_file}")
+                    continue
+            
+            # Create a dictionary to map position to text block
+            text_blocks_by_position = {}
+            for block in annotation.get("text_blocks", []):
+                if "position" in block:
+                    pos_key = (
+                        block["position"].get("x_min", 0),
+                        block["position"].get("y_min", 0),
+                        block["position"].get("x_max", 0),
+                        block["position"].get("y_max", 0)
+                    )
+                    text_blocks_by_position[pos_key] = block
+            
+            # Create a full text document by concatenating all text blocks
+            full_text = " ".join(block.get("text", "") for block in annotation.get("text_blocks", []))
+            doc = nlp.make_doc(full_text)
+            
+            # Map entity spans in the full text
+            ents = []
+            for block in annotation.get("text_blocks", []):
+                if "entity_type" in block and block["entity_type"] in entity_map:
+                    text = block.get("text", "")
+                    if text in full_text:
+                        start_idx = full_text.find(text)
+                        end_idx = start_idx + len(text)
+                        spacy_label = entity_map[block["entity_type"]]
+                        span = doc.char_span(start_idx, end_idx, label=spacy_label)
+                        if span:
+                            ents.append(span)
+            
+            # Set entities on the document
+            try:
+                doc.ents = ents
+                # Add to appropriate DocBin
+                if split == "train":
+                    train_doc_bin.add(doc)
+                else:
+                    val_doc_bin.add(doc)
+            except Exception as e:
+                print(f"Error adding entities to document: {e}")
+    
+    # Save DocBin to disk
+    train_path = os.path.join(output_dir, "train.spacy")
+    val_path = os.path.join(output_dir, "dev.spacy")
+    
+    train_doc_bin.to_disk(train_path)
+    val_doc_bin.to_disk(val_path)
+    
+    print(f"Saved spaCy training data to {train_path} and {val_path}")
+    
+    # Create train script
+    train_script = f"""
+# Train spaCy NER model
+python -m spacy train {config_path} --output {output_dir} --paths.train {train_path} --paths.dev {val_path}
+"""
+    
+    script_path = os.path.join(output_dir, "train.sh")
+    with open(script_path, "w") as f:
+        f.write(train_script)
+    
+    # Make script executable
+    os.chmod(script_path, 0o755)
+    
+    print(f"Created training script at {script_path}")
+    print("To train the spaCy NER model, run the following command:")
+    print(f"bash {script_path}")
+    
+    return True
