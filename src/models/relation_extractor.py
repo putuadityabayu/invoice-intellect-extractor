@@ -1,392 +1,202 @@
 
 """
-Relation extractor model to identify relationships between entities (e.g., item details)
+Relation extraction model for invoice processing
 """
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import List, Dict, Any, Optional
-import re
-
-
-class BiLSTMAttention(nn.Module):
-    """Bidirectional LSTM with attention mechanism"""
-    
-    def __init__(self, input_dim: int, hidden_dim: int, num_layers: int = 2, dropout: float = 0.3):
-        """
-        Initialize BiLSTM with attention
-        
-        Args:
-            input_dim: Input feature dimension
-            hidden_dim: Hidden dimension for LSTM
-            num_layers: Number of LSTM layers
-            dropout: Dropout rate
-        """
-        super(BiLSTMAttention, self).__init__()
-        
-        # Bidirectional LSTM
-        self.lstm = nn.LSTM(
-            input_dim, hidden_dim // 2, num_layers=num_layers, 
-            bidirectional=True, batch_first=True, dropout=dropout if num_layers > 1 else 0
-        )
-        
-        # Attention mechanism
-        self.attention = nn.Linear(hidden_dim, 1)
-        
-        # Layer normalization
-        self.layer_norm = nn.LayerNorm(hidden_dim)
-        
-        # Output dimension
-        self.hidden_dim = hidden_dim
-    
-    def forward(self, x):
-        """Forward pass"""
-        # Apply LSTM
-        lstm_out, _ = self.lstm(x)
-        
-        # Apply attention
-        attn_weights = F.softmax(self.attention(lstm_out), dim=1)
-        attn_applied = torch.sum(lstm_out * attn_weights, dim=1)
-        
-        # Apply layer normalization
-        normalized = self.layer_norm(attn_applied)
-        
-        return normalized
 
 
 class RelationModel(nn.Module):
-    """Neural network model for relation extraction using BiLSTM"""
+    """
+    Simple neural network for relation extraction
+    Predicts relation types between pairs of text blocks
+    """
     
-    def __init__(self, input_dim: int = 768 * 2, hidden_dim: int = 256, num_classes: int = 4):
+    def __init__(self, input_dim=768*2, hidden_dim=512, num_classes=4):
         """
-        Initialize the relation extraction model
+        Initialize the model
         
         Args:
-            input_dim: Dimension of input features (2x entity features for pairs)
+            input_dim: Dimension of input features (combined features of source and target)
             hidden_dim: Dimension of hidden layer
-            num_classes: Number of relation classes to predict
+            num_classes: Number of output classes
         """
         super(RelationModel, self).__init__()
         
-        # Input projection layer
-        self.input_projection = nn.Linear(input_dim, hidden_dim)
+        # Define layers
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.dropout1 = nn.Dropout(0.3)
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim // 2)
+        self.dropout2 = nn.Dropout(0.3)
+        self.fc3 = nn.Linear(hidden_dim // 2, num_classes)
         
-        # Bidirectional LSTM with attention
-        self.bilstm_attention = BiLSTMAttention(
-            input_dim=hidden_dim,
-            hidden_dim=hidden_dim,
+        # Relation hints for different languages
+        self.relation_hints = {
+            # English relation patterns
+            "quantity": "item_quantity",
+            "qty": "item_quantity",
+            "unit": "item_quantity",
+            "price": "item_price",
+            "cost": "item_price",
+            "rate": "item_price",
+            "amount": "item_total",
+            "total": "item_total",
+            "sum": "item_total",
+            
+            # Indonesian relation patterns
+            "jumlah": "item_quantity",
+            "unit": "item_quantity",
+            "qty": "item_quantity",
+            "kuantitas": "item_quantity",
+            "harga": "item_price",
+            "biaya": "item_price",
+            "tarif": "item_price",
+            "total": "item_total",
+            "jumlah": "item_total",
+            "subtotal": "item_total"
+        }
+        
+        # BiLSTM for processing source-target pairs more contextually
+        self.bilstm = nn.LSTM(
+            input_size=hidden_dim,
+            hidden_size=hidden_dim // 2,
             num_layers=2,
+            bidirectional=True,
+            batch_first=True,
             dropout=0.3
         )
         
-        # Output classification layers
-        self.fc1 = nn.Linear(hidden_dim, hidden_dim // 2)
-        self.fc2 = nn.Linear(hidden_dim // 2, num_classes)
-        
-        # Dropout
-        self.dropout = nn.Dropout(0.3)
-        
+        # Attention mechanism
+        self.attention = nn.MultiheadAttention(hidden_dim, num_heads=4, dropout=0.1)
+    
     def forward(self, x):
-        """Forward pass"""
-        # Reshape input for sequence processing
+        """
+        Forward pass
+        
+        Args:
+            x: Input features (concatenated source and target features)
+            
+        Returns:
+            Output logits
+        """
+        # First hidden layer
+        x = F.relu(self.fc1(x))
+        x = self.dropout1(x)
+        
+        # Add BiLSTM processing for batched inputs
         batch_size = x.size(0)
-        x_seq = x.unsqueeze(1)  # Add sequence dimension [batch, seq_len=1, features]
+        if batch_size > 1:
+            # Reshape for sequence processing
+            x_seq = x.view(batch_size, 1, -1)
+            x_seq, _ = self.bilstm(x_seq)
+            # Flatten back
+            x = x_seq.view(batch_size, -1)
         
-        # Apply input projection
-        x_projected = self.input_projection(x)
-        x_projected = F.relu(x_projected)
-        x_projected = self.dropout(x_projected)
+        # Second hidden layer
+        x = F.relu(self.fc2(x))
+        x = self.dropout2(x)
         
-        # Reshape for LSTM
-        x_lstm_input = x_projected.unsqueeze(1)  # [batch, seq_len=1, hidden_dim]
-        
-        # Apply BiLSTM with attention
-        x_lstm = self.bilstm_attention(x_lstm_input)
-        
-        # Apply output layers
-        x = F.relu(self.fc1(x_lstm))
-        x = self.dropout(x)
-        x = self.fc2(x)
+        # Output layer
+        x = self.fc3(x)
         
         return x
+    
+    def predict(self, features):
+        """
+        Predict relation type for given features
+        
+        Args:
+            features: Source and target combined features
+            
+        Returns:
+            Predicted relation type index
+        """
+        # Set model to evaluation mode
+        self.eval()
+        
+        # Forward pass
+        with torch.no_grad():
+            outputs = self.forward(features)
+            
+            # Get predicted class
+            _, predicted = torch.max(outputs, 1)
+            
+        return predicted.item()
 
 
-class RelationExtractor:
-    """Class for extracting relationships between entities in invoices"""
+class RelationTransformer(nn.Module):
+    """
+    More advanced model for relation extraction based on transformer architecture
+    Better for capturing contextual information from multilingual invoices
+    """
     
-    # Relation types mapping
-    RELATION_TYPES = {
-        0: "none",
-        1: "item_quantity",
-        2: "item_price",
-        3: "item_total"
-    }
-    
-    def __init__(self, model_path: str = None):
+    def __init__(self, input_dim=768, hidden_dim=256, num_classes=4):
         """
-        Initialize the relation extractor
+        Initialize the model
         
         Args:
-            model_path: Path to saved model weights (if None, uses default rules)
+            input_dim: Dimension of individual entity features
+            hidden_dim: Dimension of hidden layer
+            num_classes: Number of output classes
         """
-        # Initialize model architecture
-        self.model = RelationModel()
+        super(RelationTransformer, self).__init__()
         
-        # Load model weights if available
-        if model_path and torch.cuda.is_available():
-            try:
-                self.model.load_state_dict(torch.load(model_path))
-                self.model.eval()
-                self.model = self.model.cuda()
-                print(f"Loaded relation model from {model_path} (CUDA)")
-            except Exception as e:
-                print(f"Error loading relation model: {e}")
-                print("Using untrained model")
-        elif model_path:
-            try:
-                self.model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-                self.model.eval()
-                print(f"Loaded relation model from {model_path}")
-            except Exception as e:
-                print(f"Error loading relation model: {e}")
-                print("Using untrained model")
+        # Feature transformation
+        self.fc_source = nn.Linear(input_dim, hidden_dim)
+        self.fc_target = nn.Linear(input_dim, hidden_dim)
         
-        # Flag to indicate if using pretrained model or rule-based approach
-        self.use_model = model_path is not None
+        # Transformer layers
+        self.transformer_layer = nn.TransformerEncoderLayer(
+            d_model=hidden_dim,
+            nhead=4,
+            dim_feedforward=hidden_dim*2,
+            dropout=0.1,
+            batch_first=True
+        )
+        
+        # Output layers
+        self.classifier = nn.Sequential(
+            nn.Linear(hidden_dim*2, hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(hidden_dim, num_classes)
+        )
     
-    def extract_price(self, text: str) -> Optional[float]:
+    def forward(self, x):
         """
-        Extract price value from text
+        Forward pass
         
         Args:
-            text: Text containing price
+            x: Input features (concatenated source and target features)
             
         Returns:
-            Extracted price as float or None if not found
+            Output logits
         """
-        # Remove currency symbols and commas
-        cleaned_text = re.sub(r'[$€£¥,]', '', text)
+        # Split the input into source and target features
+        batch_size = x.size(0)
+        split_size = x.size(1) // 2
+        source_features = x[:, :split_size]
+        target_features = x[:, split_size:]
         
-        # Find numbers with optional decimal point
-        matches = re.findall(r'\d+\.\d+|\d+', cleaned_text)
-        if matches:
-            return float(matches[0])
-        return None
-    
-    def extract_quantity(self, text: str) -> Optional[int]:
-        """
-        Extract quantity value from text
+        # Transform features
+        source_hidden = F.relu(self.fc_source(source_features))
+        target_hidden = F.relu(self.fc_target(target_features))
         
-        Args:
-            text: Text containing quantity
-            
-        Returns:
-            Extracted quantity as int or None if not found
-        """
-        # Find integer numbers
-        matches = re.findall(r'\d+', text)
-        if matches:
-            return int(matches[0])
-        return None
-    
-    def rule_based_extraction(
-        self, text_blocks: List[Dict[str, Any]], entities: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Disabling manual rule-based extraction.
-        Return entitas/relasi kosong agar pipeline hanya mengandalkan output model ML.
-        """
-        return {
-            "invoice_number": None,
-            "invoice_date": None,
-            "name": None,
-            "items": [],
-            "subtotal": None,
-            "extra_price": [],
-            "total": None
-        }
-    
-    def extract_features(self, source_block, target_block):
-        """
-        Extract features for a pair of text blocks
+        # Prepare for transformer (sequence of length 2: source, target)
+        sequence = torch.stack([source_hidden, target_hidden], dim=1)
         
-        Args:
-            source_block: Source text block
-            target_block: Target text block
-            
-        Returns:
-            Feature tensor
-        """
-        # Create feature vector (placeholder implementation)
-        features = torch.zeros(768 * 2)
+        # Apply transformer
+        transformed = self.transformer_layer(sequence)
         
-        # Extract basic text features for source
-        source_text = source_block.get("text", "").lower()
-        for i, char in enumerate(source_text[:50]):
-            if i < 100:
-                features[i] = ord(char) / 255.0
+        # Flatten and combine
+        flat_transformed = torch.cat([
+            transformed[:, 0, :], 
+            transformed[:, 1, :]
+        ], dim=1)
         
-        # Text length feature
-        features[100] = min(len(source_text) / 100.0, 1.0)
+        # Classify
+        output = self.classifier(flat_transformed)
         
-        # Extract basic text features for target
-        target_text = target_block.get("text", "").lower()
-        for i, char in enumerate(target_text[:50]):
-            if i < 100:
-                features[768 + i] = ord(char) / 255.0
-        
-        # Text length feature for target
-        features[768 + 100] = min(len(target_text) / 100.0, 1.0)
-        
-        # Spatial features for source
-        if "position" in source_block:
-            pos = source_block["position"]
-            features[150] = pos.get("x_min", 0) / 1000.0
-            features[151] = pos.get("y_min", 0) / 1000.0
-            features[152] = pos.get("x_max", 0) / 1000.0
-            features[153] = pos.get("y_max", 0) / 1000.0
-        
-        # Spatial features for target
-        if "position" in target_block:
-            pos = target_block["position"]
-            features[768 + 150] = pos.get("x_min", 0) / 1000.0
-            features[768 + 151] = pos.get("y_min", 0) / 1000.0
-            features[768 + 152] = pos.get("x_max", 0) / 1000.0
-            features[768 + 153] = pos.get("y_max", 0) / 1000.0
-        
-        # Relative position features
-        if "position" in source_block and "position" in target_block:
-            source_pos = source_block["position"]
-            target_pos = target_block["position"]
-            
-            # Horizontal distance
-            features[200] = (target_pos.get("x_min", 0) - source_pos.get("x_max", 0)) / 1000.0
-            
-            # Vertical distance
-            features[201] = (target_pos.get("y_min", 0) - source_pos.get("y_max", 0)) / 1000.0
-            
-            # Same line feature
-            same_line = (
-                abs(source_pos.get("y_min", 0) - target_pos.get("y_min", 0)) < 20 or
-                abs(source_pos.get("y_max", 0) - target_pos.get("y_max", 0)) < 20
-            )
-            features[202] = 1.0 if same_line else 0.0
-        
-        return features
-    
-    def model_extraction(
-        self, text_blocks: List[Dict[str, Any]], entities: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Apply model-based relation extraction
-        
-        Args:
-            text_blocks: List of text blocks with text and position
-            entities: Classified entities
-            
-        Returns:
-            Dictionary with extracted relations
-        """
-        if not self.use_model:
-            return self.rule_based_extraction(text_blocks, entities)
-        
-        # Initialize result structure
-        results = {
-            "invoice_number": entities.get("invoice_number"),
-            "invoice_date": entities.get("invoice_date"),
-            "name": entities.get("customer_name"),
-            "items": [],
-            "subtotal": entities.get("subtotal"),
-            "total": entities.get("total"),
-            "extra_price": []
-        }
-        
-        # Find item names
-        item_blocks = []
-        for block in text_blocks:
-            entity_type = block.get("entity_type")
-            if entity_type == "item_name":
-                item_blocks.append(block)
-        
-        # For each item name, find related information
-        for item_block in item_blocks:
-            item_info = {"name": item_block.get("text", "")}
-            
-            # Evaluate all possible relations with other blocks
-            for other_block in text_blocks:
-                if other_block == item_block:
-                    continue
-                
-                # Extract features for this pair
-                features = self.extract_features(item_block, other_block)
-                
-                # Get model prediction
-                with torch.no_grad():
-                    features_tensor = features.unsqueeze(0)  # Add batch dimension
-                    if torch.cuda.is_available():
-                        features_tensor = features_tensor.cuda()
-                    
-                    logits = self.model(features_tensor)
-                    probabilities = F.softmax(logits, dim=1)
-                    prediction = torch.argmax(probabilities, dim=1).item()
-                    confidence = probabilities[0, prediction].item()
-                
-                # Only consider high confidence predictions
-                if confidence < 0.5:
-                    continue
-                
-                # Process prediction based on relation type
-                relation_type = self.RELATION_TYPES[prediction]
-                
-                if relation_type == "item_quantity":
-                    quantity = self.extract_quantity(other_block.get("text", ""))
-                    if quantity is not None:
-                        item_info["quantity"] = quantity
-                
-                elif relation_type == "item_price":
-                    price = self.extract_price(other_block.get("text", ""))
-                    if price is not None:
-                        item_info["unit_price"] = price
-                
-                elif relation_type == "item_total":
-                    total = self.extract_price(other_block.get("text", ""))
-                    if total is not None:
-                        item_info["total_price"] = total
-            
-            # Calculate missing values
-            if "quantity" in item_info and "unit_price" in item_info and "total_price" not in item_info:
-                item_info["total_price"] = item_info["quantity"] * item_info["unit_price"]
-            
-            if "quantity" in item_info and "total_price" in item_info and "unit_price" not in item_info:
-                if item_info["quantity"] > 0:
-                    item_info["unit_price"] = item_info["total_price"] / item_info["quantity"]
-            
-            # Ensure required fields
-            item_info["quantity"] = item_info.get("quantity", 1)
-            item_info["unit_price"] = item_info.get("unit_price", 0.0)
-            item_info["total_price"] = item_info.get("total_price", 0.0)
-            
-            # Add to results
-            results["items"].append(item_info)
-        
-        return results
-    
-    def extract(
-        self, text_blocks: List[Dict[str, Any]], entities: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Extract relationships between entities
-        
-        Args:
-            text_blocks: List of text blocks with text and position
-            entities: Classified entities
-            
-        Returns:
-            Dictionary with extracted relations
-        """
-        if self.use_model:
-            return self.model_extraction(text_blocks, entities)
-        else:
-            return self.rule_based_extraction(text_blocks, entities)
-
+        return output

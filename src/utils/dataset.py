@@ -30,8 +30,9 @@ class EntityDataset(Dataset):
         
         # Initialize tokenizer and model for feature extraction
         try:
-            self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-            self.model = AutoModel.from_pretrained("distilbert-base-uncased")
+            # Use multilingual model to better support Indonesian
+            self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-multilingual-cased")
+            self.model = AutoModel.from_pretrained("distilbert-base-multilingual-cased")
         except Exception as e:
             print(f"Warning: Could not load pretrained model: {e}")
             print("Using random features instead")
@@ -43,41 +44,39 @@ class EntityDataset(Dataset):
         self.image_dir = os.path.join(data_dir, "images", split)
         
         self.samples = []
+        
+        # Collect all entity types first to ensure comprehensive mapping
+        all_entity_types = set()
+        
+        # First pass to collect all entity types
+        for ann_file in os.listdir(self.annotations_dir):
+            if ann_file.endswith(".json"):
+                with open(os.path.join(self.annotations_dir, ann_file), "r") as f:
+                    annotation = json.load(f)
+                    for text_block in annotation.get("text_blocks", []):
+                        if "entity_type" in text_block:
+                            all_entity_types.add(text_block["entity_type"])
+        
+        # Create entity type mapping dynamically
+        self.entity_types = {entity_type: i for i, entity_type in enumerate(sorted(all_entity_types))}
+        print(f"Found {len(self.entity_types)} entity types: {self.entity_types}")
+        
+        # Now load the actual samples
         for ann_file in os.listdir(self.annotations_dir):
             if ann_file.endswith(".json"):
                 with open(os.path.join(self.annotations_dir, ann_file), "r") as f:
                     annotation = json.load(f)
                     
                     # Extract features for each text block
-                    for text_block in annotation["text_blocks"]:
-                        self.samples.append({
-                            "text": text_block["text"],
-                            "position": text_block["position"],
-                            "entity_type": text_block["entity_type"],
-                            "image_path": os.path.join(self.image_dir, 
-                                                      os.path.basename(annotation["image_path"]))
-                        })
-        
-        # Entity type mapping - updated to include all entity types found in dataset
-        self.entity_types = {
-            "invoice_number": 0,
-            "invoice_date": 1,
-            "customer_name": 2,
-            "item_name": 3,
-            "item_quantity": 4,
-            "item_price": 5,
-            "item_total": 6,  # Added missing entity type
-            "subtotal": 7,
-            "subtotal_label": 8,
-            "total": 9,
-            "total_label": 10,
-            "tax": 11,
-            "tax_label": 12,
-            "header": 13,
-            "company_name": 14,
-            "label": 15,
-            "table_header": 16
-        }
+                    for text_block in annotation.get("text_blocks", []):
+                        if "entity_type" in text_block:
+                            self.samples.append({
+                                "text": text_block["text"],
+                                "position": text_block["position"],
+                                "entity_type": text_block["entity_type"],
+                                "image_path": os.path.join(self.image_dir, 
+                                                          os.path.basename(annotation.get("image_path", "")))
+                            })
     
     def __len__(self):
         return len(self.samples)
@@ -114,7 +113,11 @@ class EntityDataset(Dataset):
         features = self.extract_features(sample["text"])
         
         # Get label - add fallback for unknown entity types
-        label = self.entity_types.get(sample["entity_type"], 0)  # Default to first class if unknown
+        if sample["entity_type"] not in self.entity_types:
+            print(f"Warning: Unknown entity type {sample['entity_type']}")
+            label = 0  # Default to first class if unknown
+        else:
+            label = self.entity_types[sample["entity_type"]]
         
         return features, torch.tensor(label)
 
@@ -131,16 +134,15 @@ class RelationDataset(Dataset):
             split: train, val, or test
             transform: Optional transforms to apply
         """
-        # ... keep existing code (initialization part)
-        
         self.data_dir = data_dir
         self.split = split
         self.transform = transform
         
         # Initialize tokenizer and model for feature extraction
         try:
-            self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-            self.model = AutoModel.from_pretrained("distilbert-base-uncased")
+            # Use multilingual model to better support Indonesian
+            self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-multilingual-cased")
+            self.model = AutoModel.from_pretrained("distilbert-base-multilingual-cased")
         except Exception as e:
             print(f"Warning: Could not load pretrained model: {e}")
             print("Using random features instead")
@@ -152,6 +154,27 @@ class RelationDataset(Dataset):
         self.image_dir = os.path.join(data_dir, "images", split)
         
         self.samples = []
+        
+        # Collect all relation types first to ensure comprehensive mapping
+        all_relation_types = set()
+        
+        # First pass to collect all relation types
+        for ann_file in os.listdir(self.annotations_dir):
+            if ann_file.endswith(".json"):
+                with open(os.path.join(self.annotations_dir, ann_file), "r") as f:
+                    annotation = json.load(f)
+                    for relation in annotation.get("relations", []):
+                        if "relation_type" in relation:
+                            all_relation_types.add(relation["relation_type"])
+        
+        # Add "none" relation type if not present
+        all_relation_types.add("none")
+        
+        # Create relation type mapping dynamically
+        self.relation_types = {relation_type: i for i, relation_type in enumerate(sorted(all_relation_types))}
+        print(f"Found {len(self.relation_types)} relation types: {self.relation_types}")
+        
+        # Now load the actual samples
         for ann_file in os.listdir(self.annotations_dir):
             if ann_file.endswith(".json"):
                 with open(os.path.join(self.annotations_dir, ann_file), "r") as f:
@@ -184,16 +207,8 @@ class RelationDataset(Dataset):
                             "target_position": target_block["position"],
                             "relation_type": relation["relation_type"],
                             "image_path": os.path.join(self.image_dir, 
-                                                     os.path.basename(annotation["image_path"]))
+                                                     os.path.basename(annotation.get("image_path", "")))
                         })
-        
-        # Relation type mapping
-        self.relation_types = {
-            "none": 0,
-            "item_quantity": 1,
-            "item_price": 2,
-            "item_total": 3
-        }
     
     def __len__(self):
         return len(self.samples)
@@ -234,6 +249,10 @@ class RelationDataset(Dataset):
         features = torch.cat([source_features, target_features], dim=0)
         
         # Get label with fallback
-        label = self.relation_types.get(sample["relation_type"], 0)  # Default to first class if unknown
+        if sample["relation_type"] not in self.relation_types:
+            print(f"Warning: Unknown relation type {sample['relation_type']}")
+            label = 0  # Default to first class if unknown
+        else:
+            label = self.relation_types[sample["relation_type"]]
         
         return features, torch.tensor(label)

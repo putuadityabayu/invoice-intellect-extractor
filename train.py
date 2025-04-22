@@ -52,33 +52,39 @@ class LayoutDataset(Dataset):
         self.image_dir = os.path.join(data_dir, "images", split)
         
         self.samples = []
+        
+        # Collect all entity types first to ensure comprehensive mapping
+        all_entity_types = set()
+        
+        # First pass to collect all entity types
+        for ann_file in os.listdir(self.annotations_dir):
+            if ann_file.endswith(".json"):
+                with open(os.path.join(self.annotations_dir, ann_file), "r") as f:
+                    annotation = json.load(f)
+                    for text_block in annotation.get("text_blocks", []):
+                        if "entity_type" in text_block:
+                            all_entity_types.add(text_block["entity_type"])
+        
+        # Create entity type mapping dynamically
+        self.entity_types = {entity_type: i for i, entity_type in enumerate(sorted(all_entity_types))}
+        print(f"Found {len(self.entity_types)} entity types for layout model: {self.entity_types}")
+        
+        # Now load the actual samples
         for ann_file in os.listdir(self.annotations_dir):
             if ann_file.endswith(".json"):
                 with open(os.path.join(self.annotations_dir, ann_file), "r") as f:
                     annotation = json.load(f)
                     
                     # Extract features for each text block
-                    for text_block in annotation["text_blocks"]:
+                    for text_block in annotation.get("text_blocks", []):
                         if "position" in text_block and "entity_type" in text_block:
                             self.samples.append({
                                 "text": text_block["text"],
                                 "position": text_block["position"],
                                 "entity_type": text_block["entity_type"],
                                 "image_path": os.path.join(self.image_dir, 
-                                                          os.path.basename(annotation["image_path"]))
+                                                          os.path.basename(annotation.get("image_path", "")))
                             })
-        
-        # Entity type mapping
-        self.entity_types = {
-            "invoice_number": 0,
-            "invoice_date": 1,
-            "customer_name": 2,
-            "item_name": 3,
-            "item_quantity": 4,
-            "item_price": 5,
-            "subtotal": 6,
-            "total": 7
-        }
     
     def __len__(self):
         return len(self.samples)
@@ -109,11 +115,16 @@ class LayoutDataset(Dataset):
         for i, char in enumerate(text.lower()[:50]):
             features[i + 1] = ord(char) / 255.0
             
-        # Simple keyword features
+        # Simple keyword features - include Indonesian keywords
         keywords = {
+            # English keywords
             "invoice": 100, "number": 101, "date": 102, "customer": 103, 
             "bill": 104, "item": 105, "quantity": 106, "price": 107, 
-            "total": 108, "subtotal": 109, "tax": 110, "amount": 111
+            "total": 108, "subtotal": 109, "tax": 110, "amount": 111,
+            # Indonesian keywords
+            "faktur": 120, "nomor": 121, "tanggal": 122, "pelanggan": 123,
+            "barang": 124, "jumlah": 125, "harga": 126, "total": 127,
+            "subtotal": 128, "pajak": 129, "kepada": 130, "penjualan": 131
         }
         
         for keyword, idx in keywords.items():
@@ -132,82 +143,16 @@ class LayoutDataset(Dataset):
         # Extract spatial features
         spatial_features = self.get_spatial_features(sample["position"])
         
-        # Get label
-        label = self.entity_types[sample["entity_type"]]
+        # Get label with fallback
+        if sample["entity_type"] not in self.entity_types:
+            print(f"Warning: Unknown entity type {sample['entity_type']}")
+            label = 0  # Default to first class if unknown
+        else:
+            label = self.entity_types[sample["entity_type"]]
         
         return text_features, spatial_features, torch.tensor(label)
 
-
-class DummyEntityDataset(Dataset):
-    """
-    Dummy dataset for entity classification training
-    In a real scenario, this would load actual training data
-    """
-    
-    def __init__(self, size=1000, feature_dim=768, num_classes=8):
-        """Initialize dummy dataset"""
-        self.size = size
-        self.feature_dim = feature_dim
-        self.num_classes = num_classes
-        
-        # Generate dummy features and labels
-        self.features = torch.randn(size, feature_dim)
-        self.labels = torch.randint(0, num_classes, (size,))
-        
-    def __len__(self):
-        return self.size
-        
-    def __getitem__(self, idx):
-        return self.features[idx], self.labels[idx]
-
-
-class DummyRelationDataset(Dataset):
-    """
-    Dummy dataset for relation extraction training
-    In a real scenario, this would load actual training data
-    """
-    
-    def __init__(self, size=1000, feature_dim=768*2, num_classes=4):
-        """Initialize dummy dataset"""
-        self.size = size
-        self.feature_dim = feature_dim
-        self.num_classes = num_classes
-        
-        # Generate dummy features and labels
-        self.features = torch.randn(size, feature_dim)
-        self.labels = torch.randint(0, num_classes, (size,))
-        
-    def __len__(self):
-        return self.size
-        
-    def __getitem__(self, idx):
-        return self.features[idx], self.labels[idx]
-
-
-class DummyLayoutDataset(Dataset):
-    """
-    Dummy dataset for layout model training
-    In a real scenario, this would load actual training data
-    """
-    
-    def __init__(self, size=1000, text_dim=768, spatial_dim=4, num_classes=8):
-        """Initialize dummy dataset"""
-        self.size = size
-        self.text_dim = text_dim
-        self.spatial_dim = spatial_dim
-        self.num_classes = num_classes
-        
-        # Generate dummy features and labels
-        self.text_features = torch.randn(size, text_dim)
-        self.spatial_features = torch.rand(size, spatial_dim)  # 0-1 normalized
-        self.labels = torch.randint(0, num_classes, (size,))
-        
-    def __len__(self):
-        return self.size
-        
-    def __getitem__(self, idx):
-        return self.text_features[idx], self.spatial_features[idx], self.labels[idx]
-
+# ... keep existing code (DummyEntityDataset, DummyRelationDataset, DummyLayoutDataset classes)
 
 def prepare_spacy_training_data(data_dir):
     """
@@ -231,7 +176,8 @@ def prepare_spacy_training_data(data_dir):
     
     # Load base model
     try:
-        nlp = spacy.blank("en")
+        # Use blank model for both English and Indonesian (multilingual)
+        nlp = spacy.blank("xx")  # xx is for multilingual
     except Exception as e:
         print(f"Error loading spaCy model: {e}")
         return False
@@ -240,8 +186,11 @@ def prepare_spacy_training_data(data_dir):
     train_doc_bin = DocBin()
     val_doc_bin = DocBin()
     
-    # Entity labels we want to train
-    entity_labels = ["INVOICE_NUMBER", "DATE", "CUSTOMER", "ITEM", "QUANTITY", "PRICE", "SUBTOTAL", "TOTAL"]
+    # Entity labels we want to train - include Indonesian equivalents
+    entity_labels = [
+        "INVOICE_NUMBER", "DATE", "CUSTOMER", "ITEM", "QUANTITY", "PRICE", 
+        "SUBTOTAL", "TOTAL", "TAX", "HEADER", "COMPANY_NAME", "ITEM_TOTAL"
+    ]
     
     # Add entity labels to NER pipe
     ner = nlp.add_pipe("ner")
@@ -256,8 +205,12 @@ def prepare_spacy_training_data(data_dir):
         "item_name": "ITEM",
         "item_quantity": "QUANTITY",
         "item_price": "PRICE",
+        "item_total": "ITEM_TOTAL",
         "subtotal": "SUBTOTAL",
-        "total": "TOTAL"
+        "total": "TOTAL",
+        "tax": "TAX",
+        "header": "HEADER",
+        "company_name": "COMPANY_NAME"
     }
     
     # Process training data
@@ -330,70 +283,146 @@ def prepare_spacy_training_data(data_dir):
     
     print(f"Saved spaCy training data to {train_path} and {val_path}")
     
-    # Create config file for training
-    config = {
-        "lang": "en",
-        "pipeline": ["ner"],
-        "components": {
-            "ner": {
-                "source": "en_core_web_sm"
-            }
-        },
-        "training": {
-            "dev_corpus": "corpora.dev",
-            "train_corpus": "corpora.train",
-            "batch_size": 8,
-            "dropout": 0.2,
-            "patience": 5,
-            "max_epochs": 20,
-            "optimizer": {
-                "@optimizers": "Adam.v1",
-                "beta1": 0.9,
-                "beta2": 0.999,
-                "L2_is_weight_decay": True,
-                "L2": 0.01,
-                "grad_clip": 1.0,
-                "learn_rate": 0.001,
-                "optimizer_params": {
-                    "eps": 1e-8
-                }
-            }
-        },
-        "nlp": {
-            "batch_size": 128,
-            "tokenizer": {
-                "@tokenizers": "spacy.Tokenizer.v1"
-            }
-        },
-        "corpus": {
-            "train": {
-                "@readers": "spacy.Corpus.v1",
-                "path": train_path,
-                "max_length": 0
-            },
-            "dev": {
-                "@readers": "spacy.Corpus.v1",
-                "path": val_path,
-                "max_length": 0
-            }
-        },
-        "paths": {
-            "train": train_path,
-            "dev": val_path
-        }
-    }
-    
-    # Save config file
+    # Create config file for training in the TOML format
+    config_content = """
+[paths]
+train = "{train_path}"
+dev = "{val_path}"
+
+[system]
+gpu_allocator = "pytorch"
+
+[nlp]
+lang = "xx"
+pipeline = ["ner"]
+batch_size = 128
+
+[components]
+
+[components.ner]
+factory = "ner"
+moves = null
+update_with_oracle_cut_size = 100
+
+[components.ner.model]
+@architectures = "spacy.TransitionBasedParser.v2"
+state_type = "ner"
+extra_state_tokens = false
+hidden_width = 64
+maxout_pieces = 2
+use_upper = true
+nO = null
+
+[components.ner.model.tok2vec]
+@architectures = "spacy.Tok2Vec.v2"
+
+[components.ner.model.tok2vec.embed]
+@architectures = "spacy.MultiHashEmbed.v2"
+width = 96
+attrs = ["NORM", "PREFIX", "SUFFIX", "SHAPE"]
+rows = [5000, 1000, 2500, 2500]
+include_static_vectors = false
+
+[components.ner.model.tok2vec.encode]
+@architectures = "spacy.MaxoutWindowEncoder.v2"
+width = 96
+depth = 4
+window_size = 1
+maxout_pieces = 3
+
+[corpora]
+
+[corpora.train]
+@readers = "spacy.Corpus.v1"
+path = "{train_path}"
+max_length = 0
+gold_preproc = false
+limit = 0
+augmenter = null
+
+[corpora.dev]
+@readers = "spacy.Corpus.v1"
+path = "{val_path}"
+max_length = 0
+gold_preproc = false
+limit = 0
+augmenter = null
+
+[training]
+dev_corpus = "corpora.dev"
+train_corpus = "corpora.train"
+seed = 0
+gpu_allocator = "pytorch"
+dropout = 0.1
+accumulate_gradient = 1
+patience = 1600
+max_epochs = 0
+max_steps = 20000
+eval_frequency = 200
+frozen_components = []
+annotating_components = []
+before_to_disk = null
+
+[training.batcher]
+@batchers = "spacy.batch_by_words.v1"
+discard_oversize = false
+tolerance = 0.2
+get_length = null
+
+[training.batcher.size]
+@schedules = "compounding.v1"
+start = 100
+stop = 1000
+compound = 1.001
+t = 0.0
+
+[training.logger]
+@loggers = "spacy.ConsoleLogger.v1"
+progress_bar = true
+
+[training.optimizer]
+@optimizers = "Adam.v1"
+beta1 = 0.9
+beta2 = 0.999
+L2_is_weight_decay = true
+L2 = 0.01
+grad_clip = 1.0
+use_averages = false
+eps = 0.00000001
+learn_rate = 0.001
+
+[training.score_weights]
+ents_f = 1.0
+ents_p = 0.0
+ents_r = 0.0
+ents_per_type = null
+
+[pretraining]
+
+[initialize]
+vectors = null
+init_tok2vec = null
+vocab_data = null
+lookups = null
+before_init = null
+after_init = null
+
+[initialize.components]
+
+[initialize.tokenizer]
+""".format(train_path=train_path, val_path=val_path)
+
+    # Save config file in TOML format
     config_path = os.path.join(output_dir, "config.cfg")
     with open(config_path, "w") as f:
-        json.dump(config, f, indent=2)
+        f.write(config_content)
     
     print(f"Created spaCy config file at {config_path}")
     
     # Create train script
-    train_script = f"""
+    train_script = f"""#!/bin/bash
 # Train spaCy NER model
-python -m spacy train {config_path} --output {output_dir} --paths.train {train_path} --paths.dev {val_path}
+python -m spacy train {config_path} --output {output_dir}/model --paths.train {train_path} --paths.dev {val_path}
 """
     
     script_path = os.path.join(output_dir, "train.sh")
@@ -431,16 +460,21 @@ def train_entity_model(
         print(f"Using real dataset from {data_dir}")
         train_dataset = EntityDataset(data_dir, split="train")
         val_dataset = EntityDataset(data_dir, split="val")
+        
+        # Get the number of classes from the dataset
+        num_classes = len(train_dataset.entity_types)
+        print(f"Number of entity classes: {num_classes}")
     else:
         print("Using dummy dataset for entity classification")
         train_dataset = DummyEntityDataset()
         val_dataset = DummyEntityDataset(size=200)  # Smaller validation set
+        num_classes = 8  # Default for dummy dataset
     
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
     
-    # Initialize model
-    model = EntityModel()
+    # Initialize model with the correct number of classes
+    model = EntityModel(num_classes=num_classes)
     
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -522,16 +556,21 @@ def train_relation_model(
         print(f"Using real dataset from {data_dir}")
         train_dataset = RelationDataset(data_dir, split="train")
         val_dataset = RelationDataset(data_dir, split="val")
+        
+        # Get the number of classes from the dataset
+        num_classes = len(train_dataset.relation_types)
+        print(f"Number of relation classes: {num_classes}")
     else:
         print("Using dummy dataset for relation extraction")
         train_dataset = DummyRelationDataset()
         val_dataset = DummyRelationDataset(size=200)  # Smaller validation set
+        num_classes = 4  # Default for dummy dataset
     
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
     
-    # Initialize model
-    model = RelationModel()
+    # Initialize model with the correct number of classes
+    model = RelationModel(num_classes=num_classes)
     
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -613,16 +652,21 @@ def train_layout_model(
         print(f"Using real dataset from {data_dir}")
         train_dataset = LayoutDataset(data_dir, split="train")
         val_dataset = LayoutDataset(data_dir, split="val")
+        
+        # Get the number of classes from the dataset
+        num_classes = len(train_dataset.entity_types)
+        print(f"Number of layout classes: {num_classes}")
     else:
         print("Using dummy dataset for layout model")
         train_dataset = DummyLayoutDataset()
         val_dataset = DummyLayoutDataset(size=200)  # Smaller validation set
+        num_classes = 8  # Default for dummy dataset
     
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
     
-    # Initialize model
-    model = LayoutModel()
+    # Initialize model with the correct number of classes
+    model = LayoutModel(num_classes=num_classes)
     
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
