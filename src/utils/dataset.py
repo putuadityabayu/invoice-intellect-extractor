@@ -58,7 +58,7 @@ class EntityDataset(Dataset):
                                                       os.path.basename(annotation["image_path"]))
                         })
         
-        # Entity type mapping
+        # Entity type mapping - updated to include all entity types found in dataset
         self.entity_types = {
             "invoice_number": 0,
             "invoice_date": 1,
@@ -66,8 +66,17 @@ class EntityDataset(Dataset):
             "item_name": 3,
             "item_quantity": 4,
             "item_price": 5,
-            "subtotal": 6,
-            "total": 7
+            "item_total": 6,  # Added missing entity type
+            "subtotal": 7,
+            "subtotal_label": 8,
+            "total": 9,
+            "total_label": 10,
+            "tax": 11,
+            "tax_label": 12,
+            "header": 13,
+            "company_name": 14,
+            "label": 15,
+            "table_header": 16
         }
     
     def __len__(self):
@@ -104,8 +113,8 @@ class EntityDataset(Dataset):
         # Extract text features
         features = self.extract_features(sample["text"])
         
-        # Get label
-        label = self.entity_types[sample["entity_type"]]
+        # Get label - add fallback for unknown entity types
+        label = self.entity_types.get(sample["entity_type"], 0)  # Default to first class if unknown
         
         return features, torch.tensor(label)
 
@@ -122,6 +131,8 @@ class RelationDataset(Dataset):
             split: train, val, or test
             transform: Optional transforms to apply
         """
+        # ... keep existing code (initialization part)
+        
         self.data_dir = data_dir
         self.split = split
         self.transform = transform
@@ -147,12 +158,24 @@ class RelationDataset(Dataset):
                     annotation = json.load(f)
                     
                     # Create a map of text blocks
-                    text_blocks = {block["id"]: block for block in annotation["text_blocks"]}
+                    text_blocks = {}
+                    for i, block in enumerate(annotation.get("text_blocks", [])):
+                        block_id = block.get("id", i)
+                        text_blocks[block_id] = block
                     
                     # Extract features for each relation
-                    for relation in annotation["relations"]:
-                        source_block = text_blocks[relation["source_id"]]
-                        target_block = text_blocks[relation["target_id"]]
+                    for relation in annotation.get("relations", []):
+                        source_id = relation.get("source_id", relation.get("head", None))
+                        target_id = relation.get("target_id", relation.get("tail", None))
+                        
+                        if source_id is None or target_id is None:
+                            continue
+                            
+                        if source_id not in text_blocks or target_id not in text_blocks:
+                            continue
+                            
+                        source_block = text_blocks[source_id]
+                        target_block = text_blocks[target_id]
                         
                         self.samples.append({
                             "source_text": source_block["text"],
@@ -210,7 +233,7 @@ class RelationDataset(Dataset):
         # Concatenate features
         features = torch.cat([source_features, target_features], dim=0)
         
-        # Get label
-        label = self.relation_types[sample["relation_type"]]
+        # Get label with fallback
+        label = self.relation_types.get(sample["relation_type"], 0)  # Default to first class if unknown
         
         return features, torch.tensor(label)
